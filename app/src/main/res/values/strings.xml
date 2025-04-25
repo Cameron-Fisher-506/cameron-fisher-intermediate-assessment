@@ -1,5 +1,20 @@
 <resources>
     <string name="app_name">TodoApp</string>
 
+    <!-- Home Screen -->
     <string name="todo_weather">Weather</string>
+
+    <!-- Task Screen -->
+    <string name="todo_new_task">New Task</string>
+    <string name="todo_task">Task</string>
+    <string name="todo_task_hint">Grocery shopping</string>
+    <string name="todo_please_provide_the_task_name">Please provide the task name.</string>
+    <string name="todo_description">Description</string>
+    <string name="todo_description_hint">Chicken, Eggs, Bread…</string>
+    <string name="todo_provide_a_brief_description">Provide a brief description of the task.</string>
+    <string name="todo_please_provide_a_brief_description">Please provide a brief description of the task.</string>
+
+    <!-- Menu Screen -->
+    <string name="todo_menu">Menu</string>
+    <string name="todo_dark_mode">Dark mode</string>
 </resources>
