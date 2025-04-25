@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">TodoApp</string>
+
+    <string name="todo_weather">Weather</string>
 </resources>
