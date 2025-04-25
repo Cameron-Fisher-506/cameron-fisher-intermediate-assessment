@@ -31,7 +31,6 @@ import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -41,6 +40,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.composecorelib.buttons.CustomCardView
 import za.co.todoapp.R
 import za.co.todoapp.data.local.mockTaskList
 
@@ -48,6 +48,28 @@ import za.co.todoapp.data.local.mockTaskList
 @Composable
 fun HomeScreen(modifier: Modifier = Modifier) {
     val scaffoldState = rememberBottomSheetScaffoldState();
+    val tabItems = listOf(
+        TabItem(
+            title = "To do",
+            unselectedIcon = Icons.Outlined.Create,
+            selectedIcon = Icons.Filled.Create
+        ),
+        TabItem(
+            title = "Completed",
+            unselectedIcon = Icons.Outlined.CheckCircle,
+            selectedIcon = Icons.Filled.CheckCircle
+        )
+    )
+    var selectedTabIndex by remember { mutableIntStateOf(0) }
+    val horizontalPagerState = rememberPagerState { tabItems.size }
+    LaunchedEffect(selectedTabIndex) {
+        horizontalPagerState.animateScrollToPage(selectedTabIndex)
+    }
+    LaunchedEffect(horizontalPagerState.currentPage, horizontalPagerState.isScrollInProgress) {
+        if (!horizontalPagerState.isScrollInProgress) {
+            selectedTabIndex = horizontalPagerState.currentPage
+        }
+    }
 
     BottomSheetScaffold(
         topBar = {
@@ -93,28 +115,6 @@ fun HomeScreen(modifier: Modifier = Modifier) {
             Column(
                 modifier = modifier.fillMaxSize()
             ) {
-                val tabItems = listOf(
-                    TabItem(
-                        title = "To do",
-                        unselectedIcon = Icons.Outlined.Create,
-                        selectedIcon = Icons.Filled.Create
-                    ),
-                    TabItem(
-                        title = "Completed",
-                        unselectedIcon = Icons.Outlined.CheckCircle,
-                        selectedIcon = Icons.Filled.CheckCircle
-                    )
-                )
-                var selectedTabIndex by remember { mutableIntStateOf(0) }
-                var horizontalPagerState = rememberPagerState { tabItems.size }
-                LaunchedEffect(selectedTabIndex) {
-                    horizontalPagerState.animateScrollToPage(selectedTabIndex)
-                }
-                LaunchedEffect(horizontalPagerState.currentPage, horizontalPagerState.isScrollInProgress) {
-                    if (!horizontalPagerState.isScrollInProgress) {
-                        selectedTabIndex = horizontalPagerState.currentPage
-                    }
-                }
                 TabRow(selectedTabIndex = selectedTabIndex) {
                     tabItems.forEachIndexed { index, tabItem ->
                         Tab(
@@ -148,7 +148,11 @@ fun HomeScreen(modifier: Modifier = Modifier) {
                                 key = { mockTaskList[it].title }
                             ) {
                                 mockTaskList.forEach { task ->
-                                    Text(task.title)
+                                    CustomCardView(
+                                        title = task.title,
+                                        description = task.description,
+                                        isComplete = task.isComplete
+                                    )
                                 }
                             }
                         }
