@@ -21,3 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "TodoApp"
 include(":app")
+include(":composeCoreLib")
