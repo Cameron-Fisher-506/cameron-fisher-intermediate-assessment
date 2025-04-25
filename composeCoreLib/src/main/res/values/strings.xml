@@ -1,9 +1,3 @@
 <resources>
     <string name="app_name">composecorelib</string>
-
-    <string name="information">Information</string>
-    <string name="label">Label</string>
-    <string name="value">Value</string>
-    <string name="DummyText">Dummy Text</string>
-    <string name="no_favourite_items">Oops, there are no favourite items saved.</string>
 </resources>
