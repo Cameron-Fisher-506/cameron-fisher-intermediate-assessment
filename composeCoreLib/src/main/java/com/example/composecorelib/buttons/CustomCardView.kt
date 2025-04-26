@@ -1,6 +1,5 @@
 package com.example.composecorelib.buttons
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -40,7 +39,7 @@ fun CustomCardView(
                     .width(8.dp),
                 onClick = { },
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = if (isComplete) Color.Green else Color.DarkGray
+                    containerColor = if (isComplete) Color.Green else Color.Red
                 ),
                 shape = RoundedCornerShape(topStart = 8.dp, bottomStart = 8.dp),
             ) { }
