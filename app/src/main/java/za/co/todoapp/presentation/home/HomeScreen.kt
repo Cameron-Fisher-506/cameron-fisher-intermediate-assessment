@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -68,6 +67,7 @@ fun HomeScreen(
     onCreate: () -> Unit,
     onDeleteTask: (task: Task) -> Unit,
     onCompleteTask: (task: Task) -> Unit,
+    onUndoCompletedTask: (task: Task) -> Unit,
     onTaskTabClicked: (isComplete: Boolean) -> Unit,
     onNavigateToTaskScreenClicked: () -> Unit,
     onNavigateToMenuScreenClicked: () -> Unit
@@ -166,18 +166,14 @@ fun HomeScreen(
                             itemsIndexed(
                                 items = taskState.value.taskList,
                                 key = { _, task ->
-                                    task.hashCode()
+                                    task.id
                                 }
                             ) { index, item ->
                                 val state = rememberSwipeToDismissBoxState(
                                     confirmValueChange = {
                                         when(it) {
-                                            SwipeToDismissBoxValue.StartToEnd -> {
-                                                onCompleteTask(item)
-                                            }
-                                            SwipeToDismissBoxValue.EndToStart -> {
-                                                onDeleteTask(item)
-                                            }
+                                            SwipeToDismissBoxValue.StartToEnd -> onCompleteTask(item)
+                                            SwipeToDismissBoxValue.EndToStart -> onDeleteTask(item)
                                             SwipeToDismissBoxValue.Settled -> {}
                                         }
                                         true
@@ -224,7 +220,64 @@ fun HomeScreen(
                             }
                         }
                     } else {
-                        //TODO: Handle completed task page - create a custom card view
+                        val listState = rememberLazyListState()
+                        LazyColumn(state = listState) {
+                            itemsIndexed(
+                                items = taskState.value.taskList,
+                                key = { _, task ->
+                                    task.id
+                                }
+                            ) { index, item ->
+                                val state = rememberSwipeToDismissBoxState(
+                                    confirmValueChange = {
+                                        when(it) {
+                                            SwipeToDismissBoxValue.StartToEnd -> onUndoCompletedTask(item)
+                                            SwipeToDismissBoxValue.EndToStart -> onDeleteTask(item)
+                                            SwipeToDismissBoxValue.Settled -> {}
+                                        }
+                                        true
+                                    }
+                                )
+
+                                SwipeToDismissBox(
+                                    state = state,
+                                    backgroundContent = {
+                                        val color = when (state.dismissDirection) {
+                                            SwipeToDismissBoxValue.EndToStart -> Color.Red
+                                            SwipeToDismissBoxValue.StartToEnd -> Color.Green
+                                            SwipeToDismissBoxValue.Settled -> Color.Transparent
+                                        }
+                                        Box(
+                                            modifier = modifier
+                                                .fillMaxSize()
+                                                .padding(top = 16.dp, start = 16.dp, end = 16.dp)
+                                                .background(color)
+                                        ) {
+                                            Icon(
+                                                modifier = modifier
+                                                    .padding(end = 16.dp)
+                                                    .align(Alignment.CenterEnd),
+                                                imageVector = Icons.Default.Delete,
+                                                contentDescription = "Delete"
+                                            )
+                                            Icon(
+                                                modifier = modifier
+                                                    .padding(start = 16.dp)
+                                                    .align(Alignment.CenterStart),
+                                                imageVector = Icons.Default.Create,
+                                                contentDescription = "Create"
+                                            )
+                                        }
+                                    }
+                                ) {
+                                    CustomCardView(
+                                        title = item.title,
+                                        description = item.description,
+                                        isComplete = item.isComplete
+                                    )
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -255,6 +308,7 @@ fun HomeScreenPreview() {
         onCreate = {},
         onDeleteTask = {},
         onCompleteTask = {},
+        onUndoCompletedTask = {},
         onTaskTabClicked = {},
         onNavigateToMenuScreenClicked = {},
         onNavigateToTaskScreenClicked = {}

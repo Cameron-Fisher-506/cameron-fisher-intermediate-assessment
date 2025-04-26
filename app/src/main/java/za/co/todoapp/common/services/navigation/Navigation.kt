@@ -49,7 +49,11 @@ fun Navigation() {
                     },
                     onCompleteTask = { task ->
                         task.isComplete = true
-                        homeScreenViewModel.completeTask(task)
+                        homeScreenViewModel.updateTaskCompleteStatus(task)
+                    },
+                    onUndoCompletedTask = { task ->
+                        task.isComplete = false
+                        homeScreenViewModel.updateTaskCompleteStatus(task)
                     },
                     onTaskTabClicked = { isComplete ->
                         homeScreenViewModel.getAllTaskByCompleteStatus(isComplete = isComplete)

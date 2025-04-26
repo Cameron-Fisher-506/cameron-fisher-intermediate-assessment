@@ -106,14 +106,14 @@ class HomeScreenViewModel(
                     if (data != null && data == 1) {
                         displaySnackbar("Task deleted successfully.")
                         deleteTaskMutableState.value = DeleteTaskState(isDeleted = data)
-                        getAllTaskByCompleteStatus(false)
+                        getAllTaskByCompleteStatus(task.isComplete)
                     }
                 }
 
                 Status.ERROR -> {
                     displaySnackbar("Task not deleted.")
                     deleteTaskMutableState.value = DeleteTaskState(errorMessage = "Task not deleted.")
-                    getAllTaskByCompleteStatus(false)
+                    getAllTaskByCompleteStatus(task.isComplete)
                 }
 
                 Status.LOADING -> {
@@ -123,25 +123,25 @@ class HomeScreenViewModel(
         }.launchIn(CoroutineScope(Dispatchers.IO))
     }
 
-    fun completeTask(task: Task) {
+    fun updateTaskCompleteStatus(task: Task) {
         saveOrUpdateTaskUseCase(task).onEach { resource ->
             when (resource.status) {
                 Status.SUCCESS -> {
                     val data = resource.data
                     if (data != null) {
                         taskMutableState.value = TaskState(taskList = listOf(data))
-                        displaySnackbar("Task completed successfully.")
-                        getAllTaskByCompleteStatus(false)
+                        displaySnackbar("Task updated successfully.")
+                        getAllTaskByCompleteStatus(!task.isComplete)
                     } else {
-                        displaySnackbar("Task not completed.")
-                        taskMutableState.value = TaskState(errorMessage = "Task not completed.")
+                        displaySnackbar("Task not updated.")
+                        taskMutableState.value = TaskState(errorMessage = "Task not updated.")
                     }
                 }
 
                 Status.ERROR -> {
-                    displaySnackbar("Task not completed.")
-                    taskMutableState.value =TaskState(errorMessage = "Task not completed.")
-                    getAllTaskByCompleteStatus(false)
+                    displaySnackbar("Task not updated.")
+                    taskMutableState.value =TaskState(errorMessage = "Task not updated.")
+                    getAllTaskByCompleteStatus(!task.isComplete)
                 }
 
                 Status.LOADING -> {
