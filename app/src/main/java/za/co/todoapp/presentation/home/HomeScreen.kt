@@ -1,6 +1,5 @@
 package za.co.todoapp.presentation.home
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -44,9 +43,13 @@ import com.example.composecorelib.buttons.CustomCardView
 import za.co.todoapp.R
 import za.co.todoapp.data.local.mockTaskList
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(modifier: Modifier = Modifier) {
+fun HomeScreen(
+    modifier: Modifier = Modifier,
+    onNavigateToTaskScreenClicked: () -> Unit,
+    onNavigateToMenuScreenClicked: () -> Unit
+) {
     val scaffoldState = rememberBottomSheetScaffoldState();
     val tabItems = listOf(
         TabItem(
@@ -77,12 +80,16 @@ fun HomeScreen(modifier: Modifier = Modifier) {
                 title = { Text("TODO") },
                 actions = {
                     IconButton(
-                        onClick = { }
+                        onClick = {
+                            onNavigateToTaskScreenClicked()
+                        }
                     ) {
                         Icon(Icons.Rounded.Add, "Add")
                     }
                     IconButton(
-                        onClick = { }
+                        onClick = {
+                            onNavigateToMenuScreenClicked()
+                        }
                     ) {
                         Icon(Icons.Rounded.Menu, "Menu")
                     }
@@ -174,5 +181,5 @@ private data class TabItem(
 @Preview(showBackground = true)
 @Composable
 fun HomeScreenPreview() {
-    HomeScreen()
+    HomeScreen(onNavigateToMenuScreenClicked = {}, onNavigateToTaskScreenClicked = {})
 }

@@ -7,6 +7,7 @@ import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import org.koin.compose.koinInject
 import za.co.todoapp.presentation.home.HomeScreen
+import za.co.todoapp.presentation.home.HomeScreenViewModel
 import za.co.todoapp.presentation.menu.MenuScreen
 import za.co.todoapp.presentation.menu.MenuScreenViewModel
 import za.co.todoapp.presentation.task.TaskScreen
@@ -32,7 +33,12 @@ fun Navigation() {
             startDestination = Destination.HomeScreen
         ) {
             composable<Destination.HomeScreen> {
-                HomeScreen()
+                val homeScreenViewModel = koinInject<HomeScreenViewModel>()
+                HomeScreen(onNavigateToTaskScreenClicked = {
+                    homeScreenViewModel.navigateToTaskScreen()
+                }) {
+                    homeScreenViewModel.navigateToMenuScreen()
+                }
             }
 
             composable<Destination.MenuScreen> {
