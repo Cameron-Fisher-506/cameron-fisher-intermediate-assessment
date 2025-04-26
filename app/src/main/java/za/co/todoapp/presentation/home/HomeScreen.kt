@@ -184,8 +184,8 @@ fun HomeScreen(
                                     state = state,
                                     backgroundContent = {
                                         val color = when (state.dismissDirection) {
-                                            SwipeToDismissBoxValue.EndToStart -> Color.Red
-                                            SwipeToDismissBoxValue.StartToEnd -> Color.Green
+                                            SwipeToDismissBoxValue.EndToStart -> MaterialTheme.colorScheme.secondaryContainer
+                                            SwipeToDismissBoxValue.StartToEnd -> MaterialTheme.colorScheme.primaryContainer
                                             SwipeToDismissBoxValue.Settled -> Color.Transparent
                                         }
                                         Box(
@@ -243,8 +243,8 @@ fun HomeScreen(
                                     state = state,
                                     backgroundContent = {
                                         val color = when (state.dismissDirection) {
-                                            SwipeToDismissBoxValue.EndToStart -> Color.Red
-                                            SwipeToDismissBoxValue.StartToEnd -> Color.Green
+                                            SwipeToDismissBoxValue.EndToStart -> MaterialTheme.colorScheme.secondaryContainer
+                                            SwipeToDismissBoxValue.StartToEnd -> MaterialTheme.colorScheme.primaryContainer
                                             SwipeToDismissBoxValue.Settled -> Color.Transparent
                                         }
                                         Box(
