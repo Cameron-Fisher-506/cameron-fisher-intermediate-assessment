@@ -67,6 +67,7 @@ fun HomeScreen(
     snackbarHostState: SnackbarHostState,
     onCreate: () -> Unit,
     onDeleteTask: (task: Task) -> Unit,
+    onCompleteTask: (task: Task) -> Unit,
     onTaskTabClicked: (isComplete: Boolean) -> Unit,
     onNavigateToTaskScreenClicked: () -> Unit,
     onNavigateToMenuScreenClicked: () -> Unit
@@ -172,7 +173,7 @@ fun HomeScreen(
                                     confirmValueChange = {
                                         when(it) {
                                             SwipeToDismissBoxValue.StartToEnd -> {
-                                                //TODO: Mark as complete
+                                                onCompleteTask(item)
                                             }
                                             SwipeToDismissBoxValue.EndToStart -> {
                                                 onDeleteTask(item)
@@ -253,6 +254,7 @@ fun HomeScreenPreview() {
         snackbarHostState = SnackbarHostState(),
         onCreate = {},
         onDeleteTask = {},
+        onCompleteTask = {},
         onTaskTabClicked = {},
         onNavigateToMenuScreenClicked = {},
         onNavigateToTaskScreenClicked = {}

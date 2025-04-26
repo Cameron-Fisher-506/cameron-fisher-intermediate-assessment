@@ -20,12 +20,15 @@ import za.co.todoapp.common.services.navigation.Navigator
 import za.co.todoapp.data.model.Task
 import za.co.todoapp.domain.DeleteTaskUseCase
 import za.co.todoapp.domain.GetAllTaskByCompleteStatusUseCase
+import za.co.todoapp.domain.SaveOrUpdateTaskUseCase
 import za.co.todoapp.presentation.BaseViewModel
+import za.co.todoapp.presentation.task.TaskScreenViewModel.TaskState
 
 class HomeScreenViewModel(
     private val navigator: Navigator,
     private val getAllTaskByCompleteStatusUseCase: GetAllTaskByCompleteStatusUseCase,
-    private val deleteTaskUseCase: DeleteTaskUseCase
+    private val deleteTaskUseCase: DeleteTaskUseCase,
+    private val saveOrUpdateTaskUseCase: SaveOrUpdateTaskUseCase
 ): BaseViewModel() {
     data class TabItem(
         val title: String,
@@ -110,10 +113,39 @@ class HomeScreenViewModel(
                 Status.ERROR -> {
                     displaySnackbar("Task not deleted.")
                     deleteTaskMutableState.value = DeleteTaskState(errorMessage = "Task not deleted.")
+                    getAllTaskByCompleteStatus(false)
                 }
 
                 Status.LOADING -> {
                     deleteTaskMutableState.value = DeleteTaskState(isLoading = true)
+                }
+            }
+        }.launchIn(CoroutineScope(Dispatchers.IO))
+    }
+
+    fun completeTask(task: Task) {
+        saveOrUpdateTaskUseCase(task).onEach { resource ->
+            when (resource.status) {
+                Status.SUCCESS -> {
+                    val data = resource.data
+                    if (data != null) {
+                        taskMutableState.value = TaskState(taskList = listOf(data))
+                        displaySnackbar("Task completed successfully.")
+                        getAllTaskByCompleteStatus(false)
+                    } else {
+                        displaySnackbar("Task not completed.")
+                        taskMutableState.value = TaskState(errorMessage = "Task not completed.")
+                    }
+                }
+
+                Status.ERROR -> {
+                    displaySnackbar("Task not completed.")
+                    taskMutableState.value =TaskState(errorMessage = "Task not completed.")
+                    getAllTaskByCompleteStatus(false)
+                }
+
+                Status.LOADING -> {
+                    taskMutableState.value = TaskState(isLoading = true)
                 }
             }
         }.launchIn(CoroutineScope(Dispatchers.IO))
