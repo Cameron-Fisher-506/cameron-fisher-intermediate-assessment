@@ -13,6 +13,7 @@
     <string name="todo_description_hint">Chicken, Eggs, Bread…</string>
     <string name="todo_provide_a_brief_description">Provide a brief description of the task.</string>
     <string name="todo_please_provide_a_brief_description">Please provide a brief description of the task.</string>
+    <string name="todo_save">Save</string>
 
     <!-- Menu Screen -->
     <string name="todo_menu">Menu</string>
