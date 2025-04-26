@@ -40,8 +40,12 @@ fun Navigation() {
                 HomeScreen(
                     taskState = homeScreenViewModel.taskState,
                     tabItemList = homeScreenViewModel.getTabItemList(),
+                    snackbarHostState = homeScreenViewModel.snackbarHostState,
                     onCreate = {
                         homeScreenViewModel.getAllTaskByCompleteStatus(false)
+                    },
+                    onDeleteTask = { task ->
+                        homeScreenViewModel.deleteTask(task)
                     },
                     onTaskTabClicked = { isComplete ->
                         homeScreenViewModel.getAllTaskByCompleteStatus(isComplete = isComplete)

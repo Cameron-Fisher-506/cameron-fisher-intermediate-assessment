@@ -3,6 +3,7 @@ package za.co.todoapp.common.di.featureModules
 import org.koin.dsl.module
 import za.co.todoapp.data.dataSource.TaskLocalDataSource
 import za.co.todoapp.data.repository.TaskRepository
+import za.co.todoapp.domain.DeleteTaskUseCase
 import za.co.todoapp.domain.GetAllTaskByCompleteStatusUseCase
 import za.co.todoapp.domain.SaveOrUpdateTaskUseCase
 import za.co.todoapp.presentation.home.HomeScreenViewModel
@@ -16,8 +17,9 @@ val homeModule = module {
 
     factory { GetAllTaskByCompleteStatusUseCase(get()) }
     factory { SaveOrUpdateTaskUseCase(get()) }
+    factory { DeleteTaskUseCase(get()) }
 
-    factory { HomeScreenViewModel(get(), get()) }
+    factory { HomeScreenViewModel(get(), get(), get()) }
     factory { MenuScreenViewModel(get()) }
     factory { TaskScreenViewModel(get(), get()) }
 }

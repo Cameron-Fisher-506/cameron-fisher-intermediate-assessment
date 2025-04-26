@@ -5,6 +5,7 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.Create
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -17,12 +18,15 @@ import za.co.todoapp.common.enum.Status
 import za.co.todoapp.common.services.navigation.Destination
 import za.co.todoapp.common.services.navigation.Navigator
 import za.co.todoapp.data.model.Task
+import za.co.todoapp.domain.DeleteTaskUseCase
 import za.co.todoapp.domain.GetAllTaskByCompleteStatusUseCase
+import za.co.todoapp.presentation.BaseViewModel
 
 class HomeScreenViewModel(
     private val navigator: Navigator,
-    private val getAllTaskByCompleteStatusUseCase: GetAllTaskByCompleteStatusUseCase
-) {
+    private val getAllTaskByCompleteStatusUseCase: GetAllTaskByCompleteStatusUseCase,
+    private val deleteTaskUseCase: DeleteTaskUseCase
+): BaseViewModel() {
     data class TabItem(
         val title: String,
         val unselectedIcon: ImageVector,
@@ -37,6 +41,15 @@ class HomeScreenViewModel(
 
     private val taskMutableState = mutableStateOf(TaskState())
     val taskState: State<TaskState> = taskMutableState
+
+    data class DeleteTaskState(
+        val isLoading: Boolean = false,
+        val isDeleted: Int = 0,
+        val errorMessage: String = ""
+    )
+
+    private val deleteTaskMutableState = mutableStateOf(DeleteTaskState())
+    val deleteTaskState: State<DeleteTaskState> = deleteTaskMutableState
 
     fun navigateToTaskScreen() = CoroutineScope(Dispatchers.IO).launch {
         navigator.navigate(destination = Destination.TaskScreen)
@@ -77,6 +90,32 @@ class HomeScreenViewModel(
 
                 Status.LOADING -> {
                     taskMutableState.value = TaskState(isLoading = true)
+                }
+            }
+        }.launchIn(CoroutineScope(Dispatchers.IO))
+    }
+
+    fun deleteTask(task: Task) {
+        deleteTaskUseCase(task).onEach { resource ->
+            when(resource.status) {
+                Status.SUCCESS -> {
+                    val data = resource.data
+                    if (data != null && data == 1) {
+                        displaySnackbar("Task deleted successfully.")
+                        deleteTaskMutableState.value = DeleteTaskState(isDeleted = data)
+                    } else {
+                        displaySnackbar("Task not deleted.")
+                        deleteTaskMutableState.value = DeleteTaskState(errorMessage = "Task not deleted.")
+                    }
+                }
+
+                Status.ERROR -> {
+                    displaySnackbar("Task not deleted.")
+                    deleteTaskMutableState.value = DeleteTaskState(errorMessage = "Task not deleted.")
+                }
+
+                Status.LOADING -> {
+                    deleteTaskMutableState.value = DeleteTaskState(isLoading = true)
                 }
             }
         }.launchIn(CoroutineScope(Dispatchers.IO))

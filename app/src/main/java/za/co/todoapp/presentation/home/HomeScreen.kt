@@ -1,18 +1,20 @@
 package za.co.todoapp.presentation.home
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Create
-import androidx.compose.material.icons.outlined.CheckCircle
-import androidx.compose.material.icons.outlined.Create
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.material3.BottomSheetScaffold
@@ -20,13 +22,18 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberBottomSheetScaffoldState
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
@@ -35,14 +42,16 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.composecorelib.buttons.CustomCardView
 import za.co.todoapp.R
+import za.co.todoapp.data.model.Task
 import za.co.todoapp.presentation.home.HomeScreenViewModel.TaskState
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -51,7 +60,9 @@ fun HomeScreen(
     modifier: Modifier = Modifier,
     taskState: State<TaskState>,
     tabItemList: List<HomeScreenViewModel.TabItem>,
+    snackbarHostState: SnackbarHostState,
     onCreate: () -> Unit,
+    onDeleteTask: (task: Task) -> Unit,
     onTaskTabClicked: (isComplete: Boolean) -> Unit,
     onNavigateToTaskScreenClicked: () -> Unit,
     onNavigateToMenuScreenClicked: () -> Unit
@@ -72,6 +83,7 @@ fun HomeScreen(
     }
 
     BottomSheetScaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = { Text("TODO") },
@@ -147,15 +159,51 @@ fun HomeScreen(
                     if (index == 0) {
                         val listState = rememberLazyListState()
                         LazyColumn(state = listState) {
-                            items(
-                                count = taskState.value.taskList.size,
-                                key = { taskState.value.taskList[it].id }
-                            ) {
-                                taskState.value.taskList.forEach { task ->
+                            itemsIndexed(
+                                items = taskState.value.taskList,
+                                key = { _, task ->
+                                    task.hashCode()
+                                }
+                            ) { index, item ->
+                                val state = rememberSwipeToDismissBoxState(
+                                    confirmValueChange = {
+                                        if (it == SwipeToDismissBoxValue.StartToEnd) {
+                                            onDeleteTask(item)
+                                        }
+                                        true
+                                    }
+                                )
+
+                                SwipeToDismissBox(
+                                    state = state,
+                                    backgroundContent = {
+                                        val color = when (state.dismissDirection) {
+                                            SwipeToDismissBoxValue.EndToStart -> Color.Red
+                                            SwipeToDismissBoxValue.StartToEnd -> Color.Green
+                                            SwipeToDismissBoxValue.Settled -> Color.Transparent
+                                        }
+                                        Box(
+                                            modifier = modifier
+                                                .wrapContentSize()
+                                                .background(color)
+                                        ) {
+                                            Icon(
+                                                modifier = modifier.align(Alignment.CenterEnd),
+                                                imageVector = Icons.Default.Delete,
+                                                contentDescription = "Delete"
+                                            )
+                                            Icon(
+                                                modifier = modifier.align(Alignment.CenterEnd),
+                                                imageVector = Icons.Default.CheckCircle,
+                                                contentDescription = "Delete"
+                                            )
+                                        }
+                                    }
+                                ) {
                                     CustomCardView(
-                                        title = task.title,
-                                        description = task.description,
-                                        isComplete = task.isComplete
+                                        title = item.title,
+                                        description = item.description,
+                                        isComplete = item.isComplete
                                     )
                                 }
                             }
@@ -175,7 +223,9 @@ fun HomeScreenPreview() {
     HomeScreen(
         taskState = remember { mutableStateOf(TaskState()) },
         tabItemList = emptyList(),
+        snackbarHostState = SnackbarHostState(),
         onCreate = {},
+        onDeleteTask = {},
         onTaskTabClicked = {},
         onNavigateToMenuScreenClicked = {},
         onNavigateToTaskScreenClicked = {}
