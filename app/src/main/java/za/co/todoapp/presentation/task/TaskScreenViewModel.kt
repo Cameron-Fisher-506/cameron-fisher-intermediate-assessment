@@ -1,5 +1,7 @@
 package za.co.todoapp.presentation.task
 
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import kotlinx.coroutines.CoroutineScope
@@ -29,9 +31,18 @@ class TaskScreenViewModel(
 
     val taskName = mutableStateOf("")
     val taskDescription = mutableStateOf("")
+    val snackbarHostState = SnackbarHostState()
 
     fun navigateUp() = CoroutineScope(Dispatchers.IO).launch {
         navigator.navigateUp()
+    }
+
+    private fun displaySnackbar(message: String) = CoroutineScope(Dispatchers.IO).launch {
+        snackbarHostState.showSnackbar(
+            message = message,
+            withDismissAction = true,
+            duration = SnackbarDuration.Long
+        )
     }
 
     fun saveOrUpdateTask(task: Task) {
@@ -41,12 +52,15 @@ class TaskScreenViewModel(
                     val data = resource.data
                     if (data != null) {
                         taskMutableState.value = TaskState(taskList = listOf(data))
+                        displaySnackbar("Task saved successfully.")
                     } else {
+                        displaySnackbar("Task not saved.")
                         taskMutableState.value = TaskState(errorMessage = "Task not saved.")
                     }
                 }
 
                 Status.ERROR -> {
+                    displaySnackbar("Task not saved.")
                     taskMutableState.value = TaskState(errorMessage = "Task not saved.")
                 }
 

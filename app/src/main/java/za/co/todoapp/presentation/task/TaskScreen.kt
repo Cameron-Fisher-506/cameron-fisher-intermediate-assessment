@@ -7,17 +7,21 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -31,14 +35,16 @@ import za.co.todoapp.data.model.Task
 @Composable
 fun TaskScreen(
     modifier: Modifier = Modifier,
-    taskName: String = "",
-    taskDescription: String = "",
+    taskName: MutableState<String>,
+    taskDescription: MutableState<String>,
+    snackbarHostState: SnackbarHostState,
     onNavigateUp: () -> Unit,
     onTaskNameValueChanged: (value: String) -> Unit,
     onTaskDescriptionValueChanged: (value: String) -> Unit,
-    onSaveClicked: (task: Task) -> Unit
+    onSaveClicked: () -> Unit
 ) {
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         modifier = modifier.wrapContentSize(),
         topBar = {
             TopAppBar(
@@ -65,7 +71,7 @@ fun TaskScreen(
                 CustomInputView(
                     title = stringResource(R.string.todo_task),
                     placeholder = stringResource(R.string.todo_task_hint),
-                    value = taskName
+                    value = taskName.value
                 ) { value ->
                     onTaskNameValueChanged(value)
                 }
@@ -73,7 +79,7 @@ fun TaskScreen(
                     title = stringResource(R.string.todo_description),
                     placeholder = stringResource(R.string.todo_description_hint),
                     description = stringResource(R.string.todo_provide_a_brief_description),
-                    value = taskDescription
+                    value = taskDescription.value
                 ) { value ->
                     onTaskDescriptionValueChanged(value)
                 }
@@ -82,7 +88,7 @@ fun TaskScreen(
                     modifier.padding(bottom = 8.dp),
                     title = stringResource(R.string.todo_save)
                 ) {
-
+                    onSaveClicked()
                 }
             }
         }
@@ -93,8 +99,9 @@ fun TaskScreen(
 @Composable
 fun TaskScreenPreview() {
     TaskScreen(
-        taskName = "",
-        taskDescription = "",
+        taskName = remember { mutableStateOf("") },
+        taskDescription = remember { mutableStateOf("") },
+        snackbarHostState = SnackbarHostState(),
         onNavigateUp = {},
         onTaskNameValueChanged = {},
         onTaskDescriptionValueChanged = {}) {

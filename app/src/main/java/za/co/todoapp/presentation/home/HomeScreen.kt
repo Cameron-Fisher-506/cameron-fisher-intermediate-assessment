@@ -29,8 +29,10 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -41,31 +43,25 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.composecorelib.buttons.CustomCardView
 import za.co.todoapp.R
+import za.co.todoapp.presentation.home.HomeScreenViewModel.TaskState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
-    taskState: HomeScreenViewModel.TaskState,
+    taskState: State<TaskState>,
+    tabItemList: List<HomeScreenViewModel.TabItem>,
+    onCreate: () -> Unit,
     onTaskTabClicked: (isComplete: Boolean) -> Unit,
     onNavigateToTaskScreenClicked: () -> Unit,
     onNavigateToMenuScreenClicked: () -> Unit
 ) {
     val scaffoldState = rememberBottomSheetScaffoldState();
-    val tabItems = listOf(
-        TabItem(
-            title = "To do",
-            unselectedIcon = Icons.Outlined.Create,
-            selectedIcon = Icons.Filled.Create
-        ),
-        TabItem(
-            title = "Completed",
-            unselectedIcon = Icons.Outlined.CheckCircle,
-            selectedIcon = Icons.Filled.CheckCircle
-        )
-    )
     var selectedTabIndex by remember { mutableIntStateOf(0) }
-    val horizontalPagerState = rememberPagerState { tabItems.size }
+    val horizontalPagerState = rememberPagerState { tabItemList.size }
+    LaunchedEffect(Unit) {
+        onCreate()
+    }
     LaunchedEffect(selectedTabIndex) {
         horizontalPagerState.animateScrollToPage(selectedTabIndex)
     }
@@ -124,7 +120,7 @@ fun HomeScreen(
                 modifier = modifier.fillMaxSize()
             ) {
                 TabRow(selectedTabIndex = selectedTabIndex) {
-                    tabItems.forEachIndexed { index, tabItem ->
+                    tabItemList.forEachIndexed { index, tabItem ->
                         Tab(
                             selected = index == selectedTabIndex,
                             onClick = {
@@ -149,14 +145,13 @@ fun HomeScreen(
                     userScrollEnabled = false
                 ) { index ->
                     if (index == 0) {
-                        //TODO: Handle To do task page - create a custom card view
                         val listState = rememberLazyListState()
                         LazyColumn(state = listState) {
                             items(
-                                count = taskState.taskList.size,
-                                key = { taskState.taskList[it].title }
+                                count = taskState.value.taskList.size,
+                                key = { taskState.value.taskList[it].id }
                             ) {
-                                taskState.taskList.forEach { task ->
+                                taskState.value.taskList.forEach { task ->
                                     CustomCardView(
                                         title = task.title,
                                         description = task.description,
@@ -174,17 +169,13 @@ fun HomeScreen(
     }
 }
 
-private data class TabItem(
-    val title: String,
-    val unselectedIcon: ImageVector,
-    val selectedIcon: ImageVector
-)
-
 @Preview(showBackground = true)
 @Composable
 fun HomeScreenPreview() {
     HomeScreen(
-        taskState = HomeScreenViewModel.TaskState(),
+        taskState = remember { mutableStateOf(TaskState()) },
+        tabItemList = emptyList(),
+        onCreate = {},
         onTaskTabClicked = {},
         onNavigateToMenuScreenClicked = {},
         onNavigateToTaskScreenClicked = {}
