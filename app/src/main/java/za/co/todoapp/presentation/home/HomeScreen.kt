@@ -41,12 +41,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.composecorelib.buttons.CustomCardView
 import za.co.todoapp.R
-import za.co.todoapp.data.local.mockTaskList
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
+    taskState: HomeScreenViewModel.TaskState,
+    onTaskTabClicked: (isComplete: Boolean) -> Unit,
     onNavigateToTaskScreenClicked: () -> Unit,
     onNavigateToMenuScreenClicked: () -> Unit
 ) {
@@ -128,6 +129,7 @@ fun HomeScreen(
                             selected = index == selectedTabIndex,
                             onClick = {
                                 selectedTabIndex = index
+                                onTaskTabClicked(selectedTabIndex != 0)
                             },
                             text = { Text(tabItem.title) },
                             icon = {
@@ -151,10 +153,10 @@ fun HomeScreen(
                         val listState = rememberLazyListState()
                         LazyColumn(state = listState) {
                             items(
-                                count = mockTaskList.size,
-                                key = { mockTaskList[it].title }
+                                count = taskState.taskList.size,
+                                key = { taskState.taskList[it].title }
                             ) {
-                                mockTaskList.forEach { task ->
+                                taskState.taskList.forEach { task ->
                                     CustomCardView(
                                         title = task.title,
                                         description = task.description,
@@ -181,5 +183,10 @@ private data class TabItem(
 @Preview(showBackground = true)
 @Composable
 fun HomeScreenPreview() {
-    HomeScreen(onNavigateToMenuScreenClicked = {}, onNavigateToTaskScreenClicked = {})
+    HomeScreen(
+        taskState = HomeScreenViewModel.TaskState(),
+        onTaskTabClicked = {},
+        onNavigateToMenuScreenClicked = {},
+        onNavigateToTaskScreenClicked = {}
+    )
 }

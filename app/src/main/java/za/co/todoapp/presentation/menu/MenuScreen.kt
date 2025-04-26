@@ -5,7 +5,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -26,6 +30,7 @@ import za.co.todoapp.R
 fun MenuScreen(
     modifier: Modifier = Modifier,
     isDarkMode: Boolean, //TODO: Test this
+    onNavigateUp: () -> Unit,
     onCheckedChangedDarkMode: (isDarkMode: Boolean) -> Unit
 ) {
     Scaffold(modifier = modifier.wrapContentSize(),
@@ -37,7 +42,16 @@ fun MenuScreen(
                     containerColor = MaterialTheme.colorScheme.tertiaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.onTertiaryContainer,
                     actionIconContentColor = MaterialTheme.colorScheme.onTertiaryContainer
-                )
+                ),
+                navigationIcon = {
+                    IconButton(
+                        onClick = {
+                            onNavigateUp()
+                        }
+                    ) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "ArrowBack")
+                    }
+                }
             )
         }) { padding ->
         Surface(modifier = modifier.padding(padding)) {
@@ -66,5 +80,8 @@ fun MenuScreen(
 @Preview(showBackground = true)
 @Composable
 fun MenuScreenPreview() {
-    MenuScreen(isDarkMode = false) {}
+    MenuScreen(
+        isDarkMode = false,
+        onNavigateUp = {}
+    ) {}
 }
