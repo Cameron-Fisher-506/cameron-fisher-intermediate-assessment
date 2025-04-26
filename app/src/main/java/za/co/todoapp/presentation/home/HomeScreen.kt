@@ -14,7 +14,10 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.outlined.CheckCircle
+import androidx.compose.material.icons.outlined.Create
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.material3.BottomSheetScaffold
@@ -52,6 +55,7 @@ import androidx.compose.ui.unit.dp
 import com.example.composecorelib.buttons.CustomCardView
 import za.co.todoapp.R
 import za.co.todoapp.data.model.Task
+import za.co.todoapp.presentation.home.HomeScreenViewModel.TabItem
 import za.co.todoapp.presentation.home.HomeScreenViewModel.TaskState
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -59,7 +63,7 @@ import za.co.todoapp.presentation.home.HomeScreenViewModel.TaskState
 fun HomeScreen(
     modifier: Modifier = Modifier,
     taskState: State<TaskState>,
-    tabItemList: List<HomeScreenViewModel.TabItem>,
+    tabItemList: List<TabItem>,
     snackbarHostState: SnackbarHostState,
     onCreate: () -> Unit,
     onDeleteTask: (task: Task) -> Unit,
@@ -152,8 +156,7 @@ fun HomeScreen(
                 HorizontalPager(
                     state = horizontalPagerState,
                     modifier = modifier
-                        .fillMaxWidth()
-                        .weight(1f),
+                        .fillMaxWidth(),
                     userScrollEnabled = false
                 ) { index ->
                     if (index == 0) {
@@ -167,8 +170,14 @@ fun HomeScreen(
                             ) { index, item ->
                                 val state = rememberSwipeToDismissBoxState(
                                     confirmValueChange = {
-                                        if (it == SwipeToDismissBoxValue.StartToEnd) {
-                                            onDeleteTask(item)
+                                        when(it) {
+                                            SwipeToDismissBoxValue.StartToEnd -> {
+                                                //TODO: Mark as complete
+                                            }
+                                            SwipeToDismissBoxValue.EndToStart -> {
+                                                onDeleteTask(item)
+                                            }
+                                            SwipeToDismissBoxValue.Settled -> {}
                                         }
                                         true
                                     }
@@ -184,18 +193,23 @@ fun HomeScreen(
                                         }
                                         Box(
                                             modifier = modifier
-                                                .wrapContentSize()
+                                                .fillMaxSize()
+                                                .padding(top = 16.dp, start = 16.dp, end = 16.dp)
                                                 .background(color)
                                         ) {
                                             Icon(
-                                                modifier = modifier.align(Alignment.CenterEnd),
+                                                modifier = modifier
+                                                    .padding(end = 16.dp)
+                                                    .align(Alignment.CenterEnd),
                                                 imageVector = Icons.Default.Delete,
                                                 contentDescription = "Delete"
                                             )
                                             Icon(
-                                                modifier = modifier.align(Alignment.CenterEnd),
+                                                modifier = modifier
+                                                    .padding(start = 16.dp)
+                                                    .align(Alignment.CenterStart),
                                                 imageVector = Icons.Default.CheckCircle,
-                                                contentDescription = "Delete"
+                                                contentDescription = "CheckCircle"
                                             )
                                         }
                                     }
@@ -221,8 +235,21 @@ fun HomeScreen(
 @Composable
 fun HomeScreenPreview() {
     HomeScreen(
-        taskState = remember { mutableStateOf(TaskState()) },
-        tabItemList = emptyList(),
+        taskState = remember { mutableStateOf(TaskState(
+            taskList = listOf(Task(title = "Title", description = "Description"))
+        )) },
+        tabItemList = listOf(
+            TabItem(
+                title = "To do",
+                unselectedIcon = Icons.Outlined.Create,
+                selectedIcon = Icons.Filled.Create
+            ),
+            TabItem(
+                title = "Completed",
+                unselectedIcon = Icons.Outlined.CheckCircle,
+                selectedIcon = Icons.Filled.CheckCircle
+            )
+        ),
         snackbarHostState = SnackbarHostState(),
         onCreate = {},
         onDeleteTask = {},

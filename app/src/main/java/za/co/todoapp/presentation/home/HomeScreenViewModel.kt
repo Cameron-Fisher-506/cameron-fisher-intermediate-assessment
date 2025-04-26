@@ -103,9 +103,7 @@ class HomeScreenViewModel(
                     if (data != null && data == 1) {
                         displaySnackbar("Task deleted successfully.")
                         deleteTaskMutableState.value = DeleteTaskState(isDeleted = data)
-                    } else {
-                        displaySnackbar("Task not deleted.")
-                        deleteTaskMutableState.value = DeleteTaskState(errorMessage = "Task not deleted.")
+                        getAllTaskByCompleteStatus(false)
                     }
                 }
 

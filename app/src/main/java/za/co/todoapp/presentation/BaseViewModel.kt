@@ -13,7 +13,7 @@ abstract class BaseViewModel {
         snackbarHostState.showSnackbar(
             message = message,
             withDismissAction = true,
-            duration = SnackbarDuration.Long
+            duration = SnackbarDuration.Short
         )
     }
 }
