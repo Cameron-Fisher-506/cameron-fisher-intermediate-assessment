@@ -5,18 +5,15 @@ import io.ktor.client.request.get
 import io.ktor.client.request.parameter
 import za.co.todoapp.common.utilities.Resource
 import za.co.todoapp.data.model.currentWeather.CurrentWeatherResponse
+import za.co.todoapp.data.remote.IKtorService.Companion.WEATHER_API_KEY
 
-class WeatherService(
+class KtorService(
     private val client: HttpClient
-) : IWeatherService {
-    companion object {
-        const val API_KEY = "36ee44e2262c414aad3113931252704"
-    }
-
+) : IKtorService {
     override suspend fun fetchTodayWeatherForecast(latitude: Double, longitude: Double): Resource<CurrentWeatherResponse> {
         return KtorServiceHelper.serviceCall {
-            client.get(HttpRoutes.CURRENT_WEATHER) {
-                parameter("key", API_KEY)
+            client.get(HttpRoutes.FORECAST_WEATHER) {
+                parameter("key", WEATHER_API_KEY)
                 parameter("q", "$latitude,$longitude")
                 parameter("days", "1")
             }

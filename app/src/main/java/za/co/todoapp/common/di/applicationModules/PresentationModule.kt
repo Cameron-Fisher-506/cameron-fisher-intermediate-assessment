@@ -4,6 +4,8 @@ import org.koin.dsl.module
 import za.co.todoapp.common.services.navigation.DefaultNavigator
 import za.co.todoapp.common.services.navigation.Destination
 import za.co.todoapp.common.services.navigation.Navigator
+import za.co.todoapp.common.services.preferences.datastore.DataStoreManager
+import za.co.todoapp.common.services.preferences.sharedPreferences.SharedPreferencesManager
 import za.co.todoapp.common.services.resource.ResourceManager
 
 val presentationModule = module {
@@ -13,5 +15,13 @@ val presentationModule = module {
 
     single<ResourceManager> {
         ResourceManager(get())
+    }
+
+    single<DataStoreManager> {
+        DataStoreManager(get())
+    }
+
+    single<SharedPreferencesManager> {
+        SharedPreferencesManager(get())
     }
 }

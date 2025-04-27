@@ -44,6 +44,7 @@ fun Navigation(
                     tabItemList = homeScreenViewModel.getTabItemList(),
                     snackbarHostState = homeScreenViewModel.snackbarHostState,
                     onCreate = {
+                        onCheckChangedDarkMode(homeScreenViewModel.isDarkMode())
                         homeScreenViewModel.getAllTaskByCompleteStatus(false)
                     },
                     onDeleteTask = { task ->
@@ -77,6 +78,7 @@ fun Navigation(
                 ) { isDarkMode ->
                     onCheckChangedDarkMode(isDarkMode)
                     menuScreenViewModel.toggleDarkMode(isDarkMode)
+                    menuScreenViewModel.saveDarkMode(isDarkMode)
                 }
             }
 
