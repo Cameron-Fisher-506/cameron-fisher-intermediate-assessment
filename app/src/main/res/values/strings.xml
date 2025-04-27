@@ -3,6 +3,8 @@
 
     <!-- Home Screen -->
     <string name="todo_weather">Weather</string>
+    <string name="todo_sunrise">Sunrise</string>
+    <string name="todo_sunset">Sunset</string>
 
     <!-- Task Screen -->
     <string name="todo_new_task">New Task</string>

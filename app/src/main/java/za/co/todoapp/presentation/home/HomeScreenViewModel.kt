@@ -5,7 +5,6 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.Create
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -20,18 +19,17 @@ import za.co.todoapp.common.services.navigation.Navigator
 import za.co.todoapp.data.model.Task
 import za.co.todoapp.data.model.currentWeather.CurrentWeatherResponse
 import za.co.todoapp.domain.DeleteTaskUseCase
-import za.co.todoapp.domain.FetchCurrentWeatherUseCase
+import za.co.todoapp.domain.FetchTodayWeatherForecastUseCase
 import za.co.todoapp.domain.GetAllTaskByCompleteStatusUseCase
 import za.co.todoapp.domain.SaveOrUpdateTaskUseCase
 import za.co.todoapp.presentation.BaseViewModel
-import za.co.todoapp.presentation.task.TaskScreenViewModel.TaskState
 
 class HomeScreenViewModel(
     private val navigator: Navigator,
     private val getAllTaskByCompleteStatusUseCase: GetAllTaskByCompleteStatusUseCase,
     private val deleteTaskUseCase: DeleteTaskUseCase,
     private val saveOrUpdateTaskUseCase: SaveOrUpdateTaskUseCase,
-    private val fetchCurrentWeatherUseCase: FetchCurrentWeatherUseCase
+    private val fetchTodayWeatherForecastUseCase: FetchTodayWeatherForecastUseCase
 ): BaseViewModel() {
     data class TabItem(
         val title: String,
@@ -67,7 +65,7 @@ class HomeScreenViewModel(
     val currentWeatherState: State<CurrentWeatherState> = currentWeatherMutableState
 
     init {
-        fetchCurrentWeather(-26.2,28.0833)
+        fetchTodayWeatherForecast(-26.2,28.0833)
     }
 
     fun navigateToTaskScreen() = CoroutineScope(Dispatchers.IO).launch {
@@ -167,8 +165,8 @@ class HomeScreenViewModel(
         }.launchIn(CoroutineScope(Dispatchers.IO))
     }
 
-    fun fetchCurrentWeather(latitude: Double, longitude: Double) {
-        fetchCurrentWeatherUseCase(latitude, longitude).onEach { resource ->
+    fun fetchTodayWeatherForecast(latitude: Double, longitude: Double) {
+        fetchTodayWeatherForecastUseCase(latitude, longitude).onEach { resource ->
             when(resource.status) {
                 Status.SUCCESS -> {
                     val data = resource.data

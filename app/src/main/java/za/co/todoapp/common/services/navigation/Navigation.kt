@@ -40,6 +40,7 @@ fun Navigation(
                 val homeScreenViewModel = koinInject<HomeScreenViewModel>()
                 HomeScreen(
                     taskState = homeScreenViewModel.taskState,
+                    currentWeatherState = homeScreenViewModel.currentWeatherState,
                     tabItemList = homeScreenViewModel.getTabItemList(),
                     snackbarHostState = homeScreenViewModel.snackbarHostState,
                     onCreate = {

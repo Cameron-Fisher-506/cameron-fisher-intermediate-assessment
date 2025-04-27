@@ -13,11 +13,12 @@ class WeatherService(
         const val API_KEY = "36ee44e2262c414aad3113931252704"
     }
 
-    override suspend fun fetchCurrentWeather(latitude: Double, longitude: Double): Resource<CurrentWeatherResponse> {
+    override suspend fun fetchTodayWeatherForecast(latitude: Double, longitude: Double): Resource<CurrentWeatherResponse> {
         return KtorServiceHelper.serviceCall {
             client.get(HttpRoutes.CURRENT_WEATHER) {
                 parameter("key", API_KEY)
                 parameter("q", "$latitude,$longitude")
+                parameter("days", "1")
             }
         }
     }

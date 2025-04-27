@@ -6,11 +6,11 @@ import za.co.todoapp.common.utilities.Resource
 import za.co.todoapp.data.model.currentWeather.CurrentWeatherResponse
 import za.co.todoapp.data.repository.WeatherRepository
 
-class FetchCurrentWeatherUseCase(
+class FetchTodayWeatherForecastUseCase(
     private val weatherRepository: WeatherRepository
 ) {
     operator fun invoke(latitude: Double, longitude: Double): Flow<Resource<CurrentWeatherResponse>> = flow {
         emit(Resource.loading())
-        emit(weatherRepository.fetchCurrentWeather(latitude, longitude))
+        emit(weatherRepository.fetchTodayWeatherForecast(latitude, longitude))
     }
 }

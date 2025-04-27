@@ -6,7 +6,7 @@ import za.co.todoapp.data.dataSource.WeatherRemoteDataSource
 import za.co.todoapp.data.repository.TaskRepository
 import za.co.todoapp.data.repository.WeatherRepository
 import za.co.todoapp.domain.DeleteTaskUseCase
-import za.co.todoapp.domain.FetchCurrentWeatherUseCase
+import za.co.todoapp.domain.FetchTodayWeatherForecastUseCase
 import za.co.todoapp.domain.GetAllTaskByCompleteStatusUseCase
 import za.co.todoapp.domain.SaveOrUpdateTaskUseCase
 import za.co.todoapp.presentation.home.HomeScreenViewModel
@@ -23,7 +23,7 @@ val homeModule = module {
     factory { GetAllTaskByCompleteStatusUseCase(get()) }
     factory { SaveOrUpdateTaskUseCase(get()) }
     factory { DeleteTaskUseCase(get()) }
-    factory { FetchCurrentWeatherUseCase(get()) }
+    factory { FetchTodayWeatherForecastUseCase(get()) }
 
     factory { HomeScreenViewModel(get(), get(), get(), get(), get()) }
     factory { MenuScreenViewModel(get()) }
