@@ -1,11 +1,15 @@
 package za.co.todoapp.presentation.home
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -18,6 +22,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.Create
 import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.LocationOn
 import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -47,13 +52,26 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import coil3.compose.AsyncImage
 import com.example.composecorelib.buttons.CustomCardView
 import za.co.todoapp.R
 import za.co.todoapp.data.model.Task
+import za.co.todoapp.data.model.currentWeather.CurrentWeatherResponse
+import za.co.todoapp.data.model.currentWeather.dto.Astro
+import za.co.todoapp.data.model.currentWeather.dto.Condition
+import za.co.todoapp.data.model.currentWeather.dto.Current
+import za.co.todoapp.data.model.currentWeather.dto.Day
+import za.co.todoapp.data.model.currentWeather.dto.Forecast
+import za.co.todoapp.data.model.currentWeather.dto.ForecastDay
+import za.co.todoapp.data.model.currentWeather.dto.Location
+import za.co.todoapp.presentation.home.HomeScreenViewModel.CurrentWeatherState
 import za.co.todoapp.presentation.home.HomeScreenViewModel.TabItem
 import za.co.todoapp.presentation.home.HomeScreenViewModel.TaskState
 
@@ -62,6 +80,7 @@ import za.co.todoapp.presentation.home.HomeScreenViewModel.TaskState
 fun HomeScreen(
     modifier: Modifier = Modifier,
     taskState: State<TaskState>,
+    currentWeatherState: State<CurrentWeatherState>,
     tabItemList: List<TabItem>,
     snackbarHostState: SnackbarHostState,
     onCreate: () -> Unit,
@@ -118,12 +137,54 @@ fun HomeScreen(
             Column(
                 modifier = modifier
                     .fillMaxWidth()
-                    .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
+                    .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = currentWeatherState.value.currentWeatherResponse.location.name,
+                        fontSize = 16.sp,
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                    Icon(
+                        imageVector = Icons.Rounded.LocationOn,
+                        contentDescription = "Add",
+                        modifier = modifier.padding(start = 8.dp)
+                    )
+                }
+
                 Text(
-                    text = stringResource(R.string.todo_weather),
+                    modifier = modifier.padding(top = 8.dp),
+                    text = "${currentWeatherState.value.currentWeatherResponse.current.temperatureCelsius}℃",
                     fontWeight = FontWeight.Bold,
+                    fontSize = 64.sp,
                     style = MaterialTheme.typography.titleLarge
+                )
+
+                if (currentWeatherState.value.currentWeatherResponse.forecast.forecastDayList.isNotEmpty()) {
+                    val forecastDay = currentWeatherState.value.currentWeatherResponse.forecast.forecastDayList.first()
+                    Text(
+                        modifier = modifier.padding(top = 8.dp),
+                        text = "${forecastDay.day.maxTemperatureCelsius}℃ / ${forecastDay.day.minTemperatureCelsius}℃",
+                        fontSize = 16.sp,
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+
+                    Text(
+                        modifier = modifier.padding(top = 8.dp),
+                        text = "Sunrise ${forecastDay.astro.sunrise} / Sunset ${forecastDay.astro.sunset}",
+                        fontSize = 16.sp,
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
+
+                Text(
+                    modifier = modifier.padding(top = 8.dp),
+                    text = currentWeatherState.value.currentWeatherResponse.current.condition.text,
+                    fontSize = 16.sp,
+                    style = MaterialTheme.typography.bodyLarge
                 )
             }
         },
@@ -171,7 +232,7 @@ fun HomeScreen(
                             ) { index, item ->
                                 val state = rememberSwipeToDismissBoxState(
                                     confirmValueChange = {
-                                        when(it) {
+                                        when (it) {
                                             SwipeToDismissBoxValue.StartToEnd -> onCompleteTask(item)
                                             SwipeToDismissBoxValue.EndToStart -> onDeleteTask(item)
                                             SwipeToDismissBoxValue.Settled -> {}
@@ -230,8 +291,11 @@ fun HomeScreen(
                             ) { index, item ->
                                 val state = rememberSwipeToDismissBoxState(
                                     confirmValueChange = {
-                                        when(it) {
-                                            SwipeToDismissBoxValue.StartToEnd -> onUndoCompletedTask(item)
+                                        when (it) {
+                                            SwipeToDismissBoxValue.StartToEnd -> onUndoCompletedTask(
+                                                item
+                                            )
+
                                             SwipeToDismissBoxValue.EndToStart -> onDeleteTask(item)
                                             SwipeToDismissBoxValue.Settled -> {}
                                         }
@@ -289,9 +353,43 @@ fun HomeScreen(
 @Composable
 fun HomeScreenPreview() {
     HomeScreen(
-        taskState = remember { mutableStateOf(TaskState(
-            taskList = listOf(Task(title = "Title", description = "Description"))
-        )) },
+        taskState = remember {
+            mutableStateOf(
+                TaskState(
+                    taskList = listOf(Task(title = "Title", description = "Description"))
+                )
+            )
+        },
+        currentWeatherState = remember {
+            mutableStateOf(
+                CurrentWeatherState(
+                    currentWeatherResponse = CurrentWeatherResponse(
+                        location = Location(name = "Johannesburg"),
+                        current = Current(
+                            temperatureCelsius = 20.0,
+                            condition = Condition(
+                                text = "Sunny",
+                                icon = "//cdn.weatherapi.com/weather/64x64/day/113.png"
+                            )
+                        ),
+                        forecast = Forecast(
+                            forecastDayList = listOf(
+                                ForecastDay(
+                                    day = Day(
+                                        maxTemperatureCelsius = 25.0,
+                                        minTemperatureCelsius = 12.0
+                                    ),
+                                    astro = Astro(
+                                        sunrise = "06:00",
+                                        sunset = "17:00"
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            )
+        },
         tabItemList = listOf(
             TabItem(
                 title = "To do",
