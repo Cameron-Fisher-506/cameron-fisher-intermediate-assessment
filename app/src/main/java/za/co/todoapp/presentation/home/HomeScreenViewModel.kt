@@ -1,7 +1,14 @@
 package za.co.todoapp.presentation.home
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Create
+import androidx.compose.material.icons.outlined.CheckCircle
+import androidx.compose.material.icons.outlined.Create
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.graphics.vector.ImageVector
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.launchIn
@@ -11,12 +18,21 @@ import za.co.todoapp.common.enum.Status
 import za.co.todoapp.common.services.navigation.Destination
 import za.co.todoapp.common.services.navigation.Navigator
 import za.co.todoapp.data.model.Task
+import za.co.todoapp.domain.DeleteTaskUseCase
 import za.co.todoapp.domain.GetAllTaskByCompleteStatusUseCase
+import za.co.todoapp.presentation.BaseViewModel
 
 class HomeScreenViewModel(
     private val navigator: Navigator,
-    private val getAllTaskByCompleteStatusUseCase: GetAllTaskByCompleteStatusUseCase
-) {
+    private val getAllTaskByCompleteStatusUseCase: GetAllTaskByCompleteStatusUseCase,
+    private val deleteTaskUseCase: DeleteTaskUseCase
+): BaseViewModel() {
+    data class TabItem(
+        val title: String,
+        val unselectedIcon: ImageVector,
+        val selectedIcon: ImageVector
+    )
+
     data class TaskState(
         val isLoading: Boolean = false,
         val taskList: List<Task> = emptyList(),
@@ -26,6 +42,15 @@ class HomeScreenViewModel(
     private val taskMutableState = mutableStateOf(TaskState())
     val taskState: State<TaskState> = taskMutableState
 
+    data class DeleteTaskState(
+        val isLoading: Boolean = false,
+        val isDeleted: Int = 0,
+        val errorMessage: String = ""
+    )
+
+    private val deleteTaskMutableState = mutableStateOf(DeleteTaskState())
+    val deleteTaskState: State<DeleteTaskState> = deleteTaskMutableState
+
     fun navigateToTaskScreen() = CoroutineScope(Dispatchers.IO).launch {
         navigator.navigate(destination = Destination.TaskScreen)
     }
@@ -33,6 +58,19 @@ class HomeScreenViewModel(
     fun navigateToMenuScreen() = CoroutineScope(Dispatchers.IO).launch {
         navigator.navigate(destination = Destination.MenuScreen)
     }
+
+    fun getTabItemList(): List<TabItem> = listOf(
+        TabItem(
+            title = "To do",
+            unselectedIcon = Icons.Outlined.Create,
+            selectedIcon = Icons.Filled.Create
+        ),
+        TabItem(
+            title = "Completed",
+            unselectedIcon = Icons.Outlined.CheckCircle,
+            selectedIcon = Icons.Filled.CheckCircle
+        )
+    )
 
     fun getAllTaskByCompleteStatus(isComplete: Boolean) {
         getAllTaskByCompleteStatusUseCase(isComplete).onEach { resource ->
@@ -52,6 +90,30 @@ class HomeScreenViewModel(
 
                 Status.LOADING -> {
                     taskMutableState.value = TaskState(isLoading = true)
+                }
+            }
+        }.launchIn(CoroutineScope(Dispatchers.IO))
+    }
+
+    fun deleteTask(task: Task) {
+        deleteTaskUseCase(task).onEach { resource ->
+            when(resource.status) {
+                Status.SUCCESS -> {
+                    val data = resource.data
+                    if (data != null && data == 1) {
+                        displaySnackbar("Task deleted successfully.")
+                        deleteTaskMutableState.value = DeleteTaskState(isDeleted = data)
+                        getAllTaskByCompleteStatus(false)
+                    }
+                }
+
+                Status.ERROR -> {
+                    displaySnackbar("Task not deleted.")
+                    deleteTaskMutableState.value = DeleteTaskState(errorMessage = "Task not deleted.")
+                }
+
+                Status.LOADING -> {
+                    deleteTaskMutableState.value = DeleteTaskState(isLoading = true)
                 }
             }
         }.launchIn(CoroutineScope(Dispatchers.IO))

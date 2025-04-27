@@ -32,9 +32,22 @@ fun CustomInputView(
                 style = MaterialTheme.typography.titleSmall
             )
             if (errorMessage.isNotBlank()) {
-                TextFieldView(modifier = modifier, placeholder) { onValueChange(it) }
+                TextFieldView(
+                    modifier = modifier,
+                    value = value,
+                    placeholder = placeholder
+                ) {
+                    onValueChange(it)
+                }
             } else {
-                TextFieldView(modifier = modifier, placeholder, true) { onValueChange(it) }
+                TextFieldView(
+                    modifier = modifier,
+                    value = value,
+                    placeholder = placeholder,
+                    isError = true
+                ) {
+                    onValueChange(it)
+                }
             }
 
             if (description.isNotBlank()) {
@@ -57,12 +70,13 @@ fun CustomInputView(
 @Composable
 fun TextFieldView(
     modifier: Modifier = Modifier,
+    value: String,
     placeholder: String,
     isError: Boolean = false,
     onValueChange: (String) -> Unit
 ) {
     TextField(
-        value = "",
+        value = value,
         isError = isError,
         modifier = modifier
             .padding(start = 20.dp, end = 20.dp, bottom = 10.dp)

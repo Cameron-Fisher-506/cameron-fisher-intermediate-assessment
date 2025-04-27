@@ -5,8 +5,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
-import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
+import za.co.todoapp.data.model.Task
 import za.co.todoapp.presentation.home.HomeScreen
 import za.co.todoapp.presentation.home.HomeScreenViewModel
 import za.co.todoapp.presentation.menu.MenuScreen
@@ -38,7 +38,15 @@ fun Navigation() {
             composable<Destination.HomeScreen> {
                 val homeScreenViewModel = koinInject<HomeScreenViewModel>()
                 HomeScreen(
-                    taskState = homeScreenViewModel.taskState.value,
+                    taskState = homeScreenViewModel.taskState,
+                    tabItemList = homeScreenViewModel.getTabItemList(),
+                    snackbarHostState = homeScreenViewModel.snackbarHostState,
+                    onCreate = {
+                        homeScreenViewModel.getAllTaskByCompleteStatus(false)
+                    },
+                    onDeleteTask = { task ->
+                        homeScreenViewModel.deleteTask(task)
+                    },
                     onTaskTabClicked = { isComplete ->
                         homeScreenViewModel.getAllTaskByCompleteStatus(isComplete = isComplete)
                     },
@@ -62,8 +70,9 @@ fun Navigation() {
             composable<Destination.TaskScreen> {
                 val taskScreenViewModel = koinInject<TaskScreenViewModel>()
                 TaskScreen(
-                    taskName = taskScreenViewModel.taskName.value,
-                    taskDescription = taskScreenViewModel.taskDescription.value,
+                    taskName = taskScreenViewModel.taskName,
+                    taskDescription = taskScreenViewModel.taskDescription,
+                    snackbarHostState = taskScreenViewModel.snackbarHostState,
                     onNavigateUp = {
                         taskScreenViewModel.navigateUp()
                     },
@@ -74,7 +83,10 @@ fun Navigation() {
                         taskScreenViewModel.taskDescription.value = value
                     }
                 ) {
-                    //TODO: Save the task
+                    taskScreenViewModel.saveOrUpdateTask(Task().apply {
+                        title = taskScreenViewModel.taskName.value
+                        description = taskScreenViewModel.taskDescription.value
+                    })
                 }
             }
         }

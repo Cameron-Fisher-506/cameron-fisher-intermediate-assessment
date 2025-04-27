@@ -17,4 +17,8 @@ class TaskLocalDataSource(application: Application) {
     suspend fun upsert(task: Task): Resource<Task> {
         return ApplicationDatabase.getResource { taskDao.upsert(task, taskDao) }
     }
+
+    suspend fun delete(task: Task): Resource<Int> {
+        return ApplicationDatabase.getResource { taskDao.delete(task) }
+    }
 }

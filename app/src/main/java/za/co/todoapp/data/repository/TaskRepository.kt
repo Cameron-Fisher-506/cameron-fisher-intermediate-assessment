@@ -14,4 +14,8 @@ class TaskRepository(
     suspend fun upsert(task: Task): Resource<Task> {
         return taskLocalDataSource.upsert(task)
     }
+
+    suspend fun delete(task: Task): Resource<Int> {
+        return taskLocalDataSource.delete(task)
+    }
 }

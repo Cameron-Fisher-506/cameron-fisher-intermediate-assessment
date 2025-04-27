@@ -8,16 +8,15 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import za.co.todoapp.common.enum.Status
-import za.co.todoapp.common.services.navigation.Destination
 import za.co.todoapp.common.services.navigation.Navigator
 import za.co.todoapp.data.model.Task
 import za.co.todoapp.domain.SaveOrUpdateTaskUseCase
-import za.co.todoapp.presentation.home.HomeScreenViewModel.TaskState
+import za.co.todoapp.presentation.BaseViewModel
 
 class TaskScreenViewModel(
     private val navigator: Navigator,
     private val saveOrUpdateTaskUseCase: SaveOrUpdateTaskUseCase
-) {
+): BaseViewModel() {
     data class TaskState(
         val isLoading: Boolean = false,
         val taskList: List<Task> = emptyList(),
@@ -41,12 +40,15 @@ class TaskScreenViewModel(
                     val data = resource.data
                     if (data != null) {
                         taskMutableState.value = TaskState(taskList = listOf(data))
+                        displaySnackbar("Task saved successfully.")
                     } else {
+                        displaySnackbar("Task not saved.")
                         taskMutableState.value = TaskState(errorMessage = "Task not saved.")
                     }
                 }
 
                 Status.ERROR -> {
+                    displaySnackbar("Task not saved.")
                     taskMutableState.value = TaskState(errorMessage = "Task not saved.")
                 }
 
