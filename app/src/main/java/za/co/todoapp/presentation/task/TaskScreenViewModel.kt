@@ -1,4 +1,4 @@
-package za.co.todoapp.presentation.home
+package za.co.todoapp.presentation.task
 
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
@@ -11,11 +11,12 @@ import za.co.todoapp.common.enum.Status
 import za.co.todoapp.common.services.navigation.Destination
 import za.co.todoapp.common.services.navigation.Navigator
 import za.co.todoapp.data.model.Task
-import za.co.todoapp.domain.GetAllTaskByCompleteStatusUseCase
+import za.co.todoapp.domain.SaveOrUpdateTaskUseCase
+import za.co.todoapp.presentation.home.HomeScreenViewModel.TaskState
 
-class HomeScreenViewModel(
+class TaskScreenViewModel(
     private val navigator: Navigator,
-    private val getAllTaskByCompleteStatusUseCase: GetAllTaskByCompleteStatusUseCase
+    private val saveOrUpdateTaskUseCase: SaveOrUpdateTaskUseCase
 ) {
     data class TaskState(
         val isLoading: Boolean = false,
@@ -26,28 +27,27 @@ class HomeScreenViewModel(
     private val taskMutableState = mutableStateOf(TaskState())
     val taskState: State<TaskState> = taskMutableState
 
-    fun navigateToTaskScreen() = CoroutineScope(Dispatchers.IO).launch {
-        navigator.navigate(destination = Destination.TaskScreen)
+    val taskName = mutableStateOf("")
+    val taskDescription = mutableStateOf("")
+
+    fun navigateUp() = CoroutineScope(Dispatchers.IO).launch {
+        navigator.navigateUp()
     }
 
-    fun navigateToMenuScreen() = CoroutineScope(Dispatchers.IO).launch {
-        navigator.navigate(destination = Destination.MenuScreen)
-    }
-
-    fun getAllTaskByCompleteStatus(isComplete: Boolean) {
-        getAllTaskByCompleteStatusUseCase(isComplete).onEach { resource ->
+    fun saveOrUpdateTask(task: Task) {
+        saveOrUpdateTaskUseCase(task).onEach { resource ->
             when (resource.status) {
                 Status.SUCCESS -> {
                     val data = resource.data
-                    if (!data.isNullOrEmpty()) {
-                        taskMutableState.value = TaskState(taskList = data)
+                    if (data != null) {
+                        taskMutableState.value = TaskState(taskList = listOf(data))
                     } else {
-                        taskMutableState.value = TaskState(errorMessage = "No tasks available.")
+                        taskMutableState.value = TaskState(errorMessage = "Task not saved.")
                     }
                 }
 
                 Status.ERROR -> {
-                    taskMutableState.value = TaskState(errorMessage = "No tasks available.")
+                    taskMutableState.value = TaskState(errorMessage = "Task not saved.")
                 }
 
                 Status.LOADING -> {
