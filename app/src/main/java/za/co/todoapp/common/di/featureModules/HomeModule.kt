@@ -19,7 +19,7 @@ val homeModule = module {
     factory { SaveOrUpdateTaskUseCase(get()) }
     factory { DeleteTaskUseCase(get()) }
 
-    factory { HomeScreenViewModel(get(), get(), get()) }
+    factory { HomeScreenViewModel(get(), get(), get(), get()) }
     factory { MenuScreenViewModel(get()) }
-    factory { TaskScreenViewModel(get(), get()) }
+    factory { TaskScreenViewModel(get(), get(), get()) }
 }

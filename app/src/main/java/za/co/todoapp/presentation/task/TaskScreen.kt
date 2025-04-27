@@ -29,7 +29,6 @@ import androidx.compose.ui.unit.dp
 import com.example.composecorelib.buttons.ButtonView
 import com.example.composecorelib.buttons.CustomInputView
 import za.co.todoapp.R
-import za.co.todoapp.data.model.Task
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -37,6 +36,8 @@ fun TaskScreen(
     modifier: Modifier = Modifier,
     taskName: MutableState<String>,
     taskDescription: MutableState<String>,
+    taskNameErrorMessage: MutableState<String>,
+    taskDescriptionErrorMessage: MutableState<String>,
     snackbarHostState: SnackbarHostState,
     onNavigateUp: () -> Unit,
     onTaskNameValueChanged: (value: String) -> Unit,
@@ -71,7 +72,8 @@ fun TaskScreen(
                 CustomInputView(
                     title = stringResource(R.string.todo_task),
                     placeholder = stringResource(R.string.todo_task_hint),
-                    value = taskName.value
+                    value = taskName.value,
+                    errorMessage = taskNameErrorMessage.value
                 ) { value ->
                     onTaskNameValueChanged(value)
                 }
@@ -79,7 +81,8 @@ fun TaskScreen(
                     title = stringResource(R.string.todo_description),
                     placeholder = stringResource(R.string.todo_description_hint),
                     description = stringResource(R.string.todo_provide_a_brief_description),
-                    value = taskDescription.value
+                    value = taskDescription.value,
+                    errorMessage = taskDescriptionErrorMessage.value
                 ) { value ->
                     onTaskDescriptionValueChanged(value)
                 }
@@ -101,10 +104,12 @@ fun TaskScreenPreview() {
     TaskScreen(
         taskName = remember { mutableStateOf("") },
         taskDescription = remember { mutableStateOf("") },
+        taskNameErrorMessage = remember { mutableStateOf("") },
+        taskDescriptionErrorMessage = remember { mutableStateOf("") },
         snackbarHostState = SnackbarHostState(),
         onNavigateUp = {},
         onTaskNameValueChanged = {},
-        onTaskDescriptionValueChanged = {}) {
-
+        onTaskDescriptionValueChanged = {}
+    ) {
     }
 }

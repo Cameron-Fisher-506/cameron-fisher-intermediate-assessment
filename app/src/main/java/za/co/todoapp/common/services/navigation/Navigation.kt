@@ -47,6 +47,10 @@ fun Navigation() {
                     onDeleteTask = { task ->
                         homeScreenViewModel.deleteTask(task)
                     },
+                    onCompleteTask = { task ->
+                        task.isComplete = true
+                        homeScreenViewModel.completeTask(task)
+                    },
                     onTaskTabClicked = { isComplete ->
                         homeScreenViewModel.getAllTaskByCompleteStatus(isComplete = isComplete)
                     },
@@ -72,21 +76,26 @@ fun Navigation() {
                 TaskScreen(
                     taskName = taskScreenViewModel.taskName,
                     taskDescription = taskScreenViewModel.taskDescription,
+                    taskNameErrorMessage = taskScreenViewModel.taskNameErrorMessage,
+                    taskDescriptionErrorMessage = taskScreenViewModel.taskDescriptionErrorMessage,
                     snackbarHostState = taskScreenViewModel.snackbarHostState,
                     onNavigateUp = {
                         taskScreenViewModel.navigateUp()
                     },
                     onTaskNameValueChanged = { value ->
+                        if (taskScreenViewModel.taskNameErrorMessage.value.isNotBlank()) {
+                            taskScreenViewModel.taskNameErrorMessage.value = ""
+                        }
                         taskScreenViewModel.taskName.value = value
                     },
                     onTaskDescriptionValueChanged = { value ->
+                        if (taskScreenViewModel.taskDescriptionErrorMessage.value.isNotBlank()) {
+                            taskScreenViewModel.taskDescriptionErrorMessage.value = ""
+                        }
                         taskScreenViewModel.taskDescription.value = value
                     }
                 ) {
-                    taskScreenViewModel.saveOrUpdateTask(Task().apply {
-                        title = taskScreenViewModel.taskName.value
-                        description = taskScreenViewModel.taskDescription.value
-                    })
+                    taskScreenViewModel.validInputs()
                 }
             }
         }
