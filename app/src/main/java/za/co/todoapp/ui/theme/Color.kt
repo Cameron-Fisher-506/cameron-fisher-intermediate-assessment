@@ -2,14 +2,15 @@ package za.co.todoapp.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val Blue = Color(0xFF38619B)
-val Red = Color(0xFFEF4B4C)
-val NavyBlue = Color(0xFF43506C)
-val LightGrayishBlue = Color(0xFFE9F0F4)
+val LightModeTertiary = Color(0xFF303F9F)
+val LightModeSecondary = Color(0xFFEF4B4C)
+val LightModePrimary = Color(0xFF3F51B5)
+val LightModeSurface = Color(0xFFE9F0F4)
 
-val DarkModeBlack = Color(0xFF000000)
-val DarkModeDarkGray = Color(0xFF222222)
-val DarkModeDarkGreen = Color(0xFF169976)
+val DarkModeTertiary = Color(0xFF212121)
+val DarkModeSecondary = Color(0xFFEF4B4C)
+val DarkModePrimary = Color(0xFF3F51B5)
+val DarkModeSurface = Color(0xFF757575)
 
 sealed class ThemeColors(
     val background: Color,
@@ -29,43 +30,43 @@ sealed class ThemeColors(
     val text: Color
 )  {
     data object Dark: ThemeColors(
-        primary = DarkModeDarkGreen,
+        primary = DarkModePrimary,
         onPrimary = Color.White,
-        primaryContainer = DarkModeDarkGreen,
+        primaryContainer = DarkModePrimary,
         onPrimaryContainer = Color.White,
 
-        secondary = Red,
+        secondary = DarkModeSecondary,
         onSecondary = Color.White,
-        secondaryContainer = Red,
+        secondaryContainer = DarkModeSecondary,
         onSecondaryContainer = Color.White,
 
-        tertiary = DarkModeBlack,
+        tertiary = DarkModeTertiary,
         onTertiary = Color.White,
-        tertiaryContainer = DarkModeBlack,
+        tertiaryContainer = DarkModeTertiary,
         onTertiaryContainer = Color.White,
 
         text = Color.White,
         background = Color.Black,
-        surface = DarkModeDarkGray
+        surface = DarkModeSurface
     )
     data object Light: ThemeColors(
-        primary = Blue,
+        primary = LightModePrimary,
         onPrimary = Color.White,
-        primaryContainer = Blue,
+        primaryContainer = LightModePrimary,
         onPrimaryContainer = Color.White,
 
-        secondary = Red,
+        secondary = LightModeSecondary,
         onSecondary = Color.White,
-        secondaryContainer = Red,
+        secondaryContainer = LightModeSecondary,
         onSecondaryContainer = Color.White,
 
-        tertiary = NavyBlue,
+        tertiary = LightModeTertiary,
         onTertiary = Color.White,
-        tertiaryContainer = NavyBlue,
+        tertiaryContainer = LightModeTertiary,
         onTertiaryContainer = Color.White,
 
         text = Color.Black,
         background = Color.White,
-        surface = LightGrayishBlue,
+        surface = LightModeSurface,
     )
 }

@@ -8,6 +8,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldColors
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -32,9 +34,22 @@ fun CustomInputView(
                 style = MaterialTheme.typography.titleSmall
             )
             if (errorMessage.isNotBlank()) {
-                TextFieldView(modifier = modifier, placeholder) { onValueChange(it) }
+                TextFieldView(
+                    modifier = modifier,
+                    value = value,
+                    placeholder = placeholder
+                ) {
+                    onValueChange(it)
+                }
             } else {
-                TextFieldView(modifier = modifier, placeholder, true) { onValueChange(it) }
+                TextFieldView(
+                    modifier = modifier,
+                    value = value,
+                    placeholder = placeholder,
+                    isError = true
+                ) {
+                    onValueChange(it)
+                }
             }
 
             if (description.isNotBlank()) {
@@ -57,18 +72,26 @@ fun CustomInputView(
 @Composable
 fun TextFieldView(
     modifier: Modifier = Modifier,
+    value: String,
     placeholder: String,
     isError: Boolean = false,
     onValueChange: (String) -> Unit
 ) {
     TextField(
-        value = "",
+        value = value,
         isError = isError,
         modifier = modifier
             .padding(start = 20.dp, end = 20.dp, bottom = 10.dp)
             .fillMaxWidth(),
         placeholder = { Text(placeholder) },
-        onValueChange = { onValueChange(it) }
+        onValueChange = { onValueChange(it) },
+        colors = TextFieldDefaults.colors(
+            focusedContainerColor = Color.Transparent,
+            unfocusedContainerColor = Color.Transparent,
+            disabledContainerColor = Color.Transparent,
+            errorContainerColor = Color.Transparent,
+            cursorColor = MaterialTheme.colorScheme.primary
+        )
     )
 }
 
