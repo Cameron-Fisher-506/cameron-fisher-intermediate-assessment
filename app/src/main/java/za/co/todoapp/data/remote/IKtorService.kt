@@ -10,12 +10,14 @@ import kotlinx.serialization.json.Json
 import za.co.todoapp.common.utilities.Resource
 import za.co.todoapp.data.model.currentWeather.CurrentWeatherResponse
 
-interface IWeatherService {
+interface IKtorService {
     suspend fun fetchTodayWeatherForecast(latitude: Double, longitude: Double): Resource<CurrentWeatherResponse>
 
     companion object {
-        fun create(): IWeatherService {
-            return WeatherService(
+        const val WEATHER_API_KEY = "36ee44e2262c414aad3113931252704"
+
+        fun create(): IKtorService {
+            return KtorService(
                 client = HttpClient(Android) {
                     install(Logging) {
                         level = LogLevel.ALL

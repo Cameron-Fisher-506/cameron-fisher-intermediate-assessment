@@ -16,6 +16,7 @@ import kotlinx.coroutines.launch
 import za.co.todoapp.common.enum.Status
 import za.co.todoapp.common.services.navigation.Destination
 import za.co.todoapp.common.services.navigation.Navigator
+import za.co.todoapp.common.services.preferences.sharedPreferences.SharedPreferencesManager
 import za.co.todoapp.data.model.Task
 import za.co.todoapp.data.model.currentWeather.CurrentWeatherResponse
 import za.co.todoapp.domain.DeleteTaskUseCase
@@ -26,6 +27,7 @@ import za.co.todoapp.presentation.BaseViewModel
 
 class HomeScreenViewModel(
     private val navigator: Navigator,
+    private val sharedPreferencesManager: SharedPreferencesManager,
     private val getAllTaskByCompleteStatusUseCase: GetAllTaskByCompleteStatusUseCase,
     private val deleteTaskUseCase: DeleteTaskUseCase,
     private val saveOrUpdateTaskUseCase: SaveOrUpdateTaskUseCase,
@@ -88,6 +90,8 @@ class HomeScreenViewModel(
             selectedIcon = Icons.Filled.CheckCircle
         )
     )
+
+    fun isDarkMode(): Boolean = sharedPreferencesManager.isDarkMode()
 
     fun getAllTaskByCompleteStatus(isComplete: Boolean) {
         getAllTaskByCompleteStatusUseCase(isComplete).onEach { resource ->

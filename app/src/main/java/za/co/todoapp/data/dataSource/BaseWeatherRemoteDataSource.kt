@@ -1,8 +1,7 @@
 package za.co.todoapp.data.dataSource
 
-import za.co.todoapp.data.remote.IWeatherService
-import za.co.todoapp.data.remote.WeatherService
+import za.co.todoapp.data.remote.IKtorService
 
 abstract class BaseWeatherRemoteDataSource(
-    protected val weatherService: IWeatherService = IWeatherService.create()
+    protected val ktorService: IKtorService = IKtorService.create()
 )
