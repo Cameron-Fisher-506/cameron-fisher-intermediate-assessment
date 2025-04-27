@@ -18,7 +18,9 @@ import za.co.todoapp.common.enum.Status
 import za.co.todoapp.common.services.navigation.Destination
 import za.co.todoapp.common.services.navigation.Navigator
 import za.co.todoapp.data.model.Task
+import za.co.todoapp.data.model.currentWeather.CurrentWeatherResponse
 import za.co.todoapp.domain.DeleteTaskUseCase
+import za.co.todoapp.domain.FetchCurrentWeatherUseCase
 import za.co.todoapp.domain.GetAllTaskByCompleteStatusUseCase
 import za.co.todoapp.domain.SaveOrUpdateTaskUseCase
 import za.co.todoapp.presentation.BaseViewModel
@@ -28,7 +30,8 @@ class HomeScreenViewModel(
     private val navigator: Navigator,
     private val getAllTaskByCompleteStatusUseCase: GetAllTaskByCompleteStatusUseCase,
     private val deleteTaskUseCase: DeleteTaskUseCase,
-    private val saveOrUpdateTaskUseCase: SaveOrUpdateTaskUseCase
+    private val saveOrUpdateTaskUseCase: SaveOrUpdateTaskUseCase,
+    private val fetchCurrentWeatherUseCase: FetchCurrentWeatherUseCase
 ): BaseViewModel() {
     data class TabItem(
         val title: String,
@@ -53,6 +56,19 @@ class HomeScreenViewModel(
 
     private val deleteTaskMutableState = mutableStateOf(DeleteTaskState())
     val deleteTaskState: State<DeleteTaskState> = deleteTaskMutableState
+
+    data class CurrentWeatherState(
+        val isLoading: Boolean = false,
+        val currentWeatherResponse: CurrentWeatherResponse = CurrentWeatherResponse(),
+        val errorMessage: String = ""
+    )
+
+    private val currentWeatherMutableState = mutableStateOf(CurrentWeatherState())
+    val currentWeatherState: State<CurrentWeatherState> = currentWeatherMutableState
+
+    init {
+        fetchCurrentWeather(-26.2,28.0833)
+    }
 
     fun navigateToTaskScreen() = CoroutineScope(Dispatchers.IO).launch {
         navigator.navigate(destination = Destination.TaskScreen)
@@ -146,6 +162,25 @@ class HomeScreenViewModel(
 
                 Status.LOADING -> {
                     taskMutableState.value = TaskState(isLoading = true)
+                }
+            }
+        }.launchIn(CoroutineScope(Dispatchers.IO))
+    }
+
+    fun fetchCurrentWeather(latitude: Double, longitude: Double) {
+        fetchCurrentWeatherUseCase(latitude, longitude).onEach { resource ->
+            when(resource.status) {
+                Status.SUCCESS -> {
+                    val data = resource.data
+                    if (data != null) {
+                        currentWeatherMutableState.value = CurrentWeatherState(currentWeatherResponse = data)
+                    }
+                }
+                Status.ERROR -> {
+                    currentWeatherMutableState.value = CurrentWeatherState(errorMessage = "Weather not found")
+                }
+                Status.LOADING -> {
+                    currentWeatherMutableState.value = CurrentWeatherState(isLoading = true)
                 }
             }
         }.launchIn(CoroutineScope(Dispatchers.IO))
