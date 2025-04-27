@@ -2,6 +2,7 @@ package za.co.todoapp.presentation.task
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
@@ -54,7 +55,7 @@ fun TaskScreen(
                 }, colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.tertiaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.onTertiaryContainer,
-                    actionIconContentColor = MaterialTheme.colorScheme.onTertiaryContainer
+                    navigationIconContentColor = MaterialTheme.colorScheme.onTertiaryContainer
                 ),
                 navigationIcon = {
                     IconButton(
@@ -68,7 +69,7 @@ fun TaskScreen(
             )
         }) { padding ->
         Surface(modifier = modifier.padding(padding)) {
-            Column(modifier = modifier.fillMaxWidth()) {
+            Column(modifier = modifier.fillMaxSize()) {
                 CustomInputView(
                     title = stringResource(R.string.todo_task),
                     placeholder = stringResource(R.string.todo_task_hint),

@@ -6,7 +6,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import org.koin.compose.koinInject
-import za.co.todoapp.data.model.Task
 import za.co.todoapp.presentation.home.HomeScreen
 import za.co.todoapp.presentation.home.HomeScreenViewModel
 import za.co.todoapp.presentation.menu.MenuScreen
@@ -15,7 +14,9 @@ import za.co.todoapp.presentation.task.TaskScreen
 import za.co.todoapp.presentation.task.TaskScreenViewModel
 
 @Composable
-fun Navigation() {
+fun Navigation(
+    onCheckChangedDarkMode: (isDarkMode: Boolean) -> Unit
+) {
     val navController = rememberNavController()
     val navigator = koinInject<Navigator>()
     ObserveAsEvents(flow = navigator.navigationActions) { action ->
@@ -49,7 +50,11 @@ fun Navigation() {
                     },
                     onCompleteTask = { task ->
                         task.isComplete = true
-                        homeScreenViewModel.completeTask(task)
+                        homeScreenViewModel.updateTaskCompleteStatus(task)
+                    },
+                    onUndoCompletedTask = { task ->
+                        task.isComplete = false
+                        homeScreenViewModel.updateTaskCompleteStatus(task)
                     },
                     onTaskTabClicked = { isComplete ->
                         homeScreenViewModel.getAllTaskByCompleteStatus(isComplete = isComplete)
@@ -64,11 +69,14 @@ fun Navigation() {
             composable<Destination.MenuScreen> {
                 val menuScreenViewModel = koinInject<MenuScreenViewModel>()
                 MenuScreen(
-                    isDarkMode = menuScreenViewModel.isDarkModeMutableState.value,
+                    isDarkMode = menuScreenViewModel.isDarkModeMutableState,
                     onNavigateUp = {
                         menuScreenViewModel.navigateUp()
                     }
-                ) {}
+                ) { isDarkMode ->
+                    onCheckChangedDarkMode(isDarkMode)
+                    menuScreenViewModel.toggleDarkMode(isDarkMode)
+                }
             }
 
             composable<Destination.TaskScreen> {

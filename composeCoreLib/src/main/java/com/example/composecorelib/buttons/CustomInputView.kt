@@ -8,6 +8,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldColors
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -82,7 +84,14 @@ fun TextFieldView(
             .padding(start = 20.dp, end = 20.dp, bottom = 10.dp)
             .fillMaxWidth(),
         placeholder = { Text(placeholder) },
-        onValueChange = { onValueChange(it) }
+        onValueChange = { onValueChange(it) },
+        colors = TextFieldDefaults.colors(
+            focusedContainerColor = Color.Transparent,
+            unfocusedContainerColor = Color.Transparent,
+            disabledContainerColor = Color.Transparent,
+            errorContainerColor = Color.Transparent,
+            cursorColor = MaterialTheme.colorScheme.primary
+        )
     )
 }
 
