@@ -107,8 +107,6 @@ fun HomeScreen(
         }
     }
 
-
-
     BottomSheetScaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {

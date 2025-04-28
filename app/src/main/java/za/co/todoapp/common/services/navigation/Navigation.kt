@@ -111,7 +111,7 @@ fun Navigation(
                         taskScreenViewModel.taskDescription.value = value
                     }
                 ) {
-                    taskScreenViewModel.validInputs()
+                    taskScreenViewModel.validateInputs()
                 }
             }
         }

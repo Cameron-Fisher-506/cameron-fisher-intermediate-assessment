@@ -39,7 +39,7 @@ class TaskScreenViewModel(
         navigator.navigateUp()
     }
 
-    fun validInputs() {
+    fun validateInputs() {
         when {
             taskName.value.isBlank() -> {
                 taskNameErrorMessage.value = resourceManager.getString(R.string.todo_please_provide_the_task_name)
