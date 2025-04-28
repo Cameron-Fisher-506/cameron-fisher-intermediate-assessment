@@ -25,7 +25,7 @@ val homeModule = module {
     factory { DeleteTaskUseCase(get()) }
     factory { FetchTodayWeatherForecastUseCase(get()) }
 
-    factory { HomeScreenViewModel(get(), get(), get(), get(), get(), get()) }
+    factory { HomeScreenViewModel(get(), get(), get(), get(), get(), get(), get(), get()) }
     factory { MenuScreenViewModel(get(), get()) }
     factory { TaskScreenViewModel(get(), get(), get()) }
 }

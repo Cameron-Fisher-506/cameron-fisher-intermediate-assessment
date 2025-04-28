@@ -47,6 +47,11 @@ fun Navigation(
                         onCheckChangedDarkMode(homeScreenViewModel.isDarkMode())
                         homeScreenViewModel.getAllTaskByCompleteStatus(false)
                     },
+                    onGetDeviceLocation = { isLocationPermissionGranted ->
+                        homeScreenViewModel.getDeviceLocation(isLocationPermissionGranted) { latitude, longitude ->
+                            homeScreenViewModel.fetchTodayWeatherForecast(latitude, longitude)
+                        }
+                    },
                     onDeleteTask = { task ->
                         homeScreenViewModel.deleteTask(task)
                     },

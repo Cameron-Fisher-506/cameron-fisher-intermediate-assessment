@@ -13,10 +13,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import za.co.todoapp.R
 import za.co.todoapp.common.enum.Status
+import za.co.todoapp.common.services.location.LocationManager
 import za.co.todoapp.common.services.navigation.Destination
 import za.co.todoapp.common.services.navigation.Navigator
 import za.co.todoapp.common.services.preferences.sharedPreferences.SharedPreferencesManager
+import za.co.todoapp.common.services.resource.ResourceManager
 import za.co.todoapp.data.model.Task
 import za.co.todoapp.data.model.currentWeather.CurrentWeatherResponse
 import za.co.todoapp.domain.DeleteTaskUseCase
@@ -27,12 +30,14 @@ import za.co.todoapp.presentation.BaseViewModel
 
 class HomeScreenViewModel(
     private val navigator: Navigator,
+    private val locationManager: LocationManager,
+    private val resourceManager: ResourceManager,
     private val sharedPreferencesManager: SharedPreferencesManager,
     private val getAllTaskByCompleteStatusUseCase: GetAllTaskByCompleteStatusUseCase,
     private val deleteTaskUseCase: DeleteTaskUseCase,
     private val saveOrUpdateTaskUseCase: SaveOrUpdateTaskUseCase,
     private val fetchTodayWeatherForecastUseCase: FetchTodayWeatherForecastUseCase
-): BaseViewModel() {
+) : BaseViewModel() {
     data class TabItem(
         val title: String,
         val unselectedIcon: ImageVector,
@@ -66,10 +71,6 @@ class HomeScreenViewModel(
     private val currentWeatherMutableState = mutableStateOf(CurrentWeatherState())
     val currentWeatherState: State<CurrentWeatherState> = currentWeatherMutableState
 
-    init {
-        fetchTodayWeatherForecast(-26.2,28.0833)
-    }
-
     fun navigateToTaskScreen() = CoroutineScope(Dispatchers.IO).launch {
         navigator.navigate(destination = Destination.TaskScreen)
     }
@@ -90,6 +91,20 @@ class HomeScreenViewModel(
             selectedIcon = Icons.Filled.CheckCircle
         )
     )
+
+    fun getDeviceLocation(
+        isLocationPermissionGranted: Boolean,
+        onSuccessListener: (latitude: Double, longitude: Double) -> Unit
+    ) {
+        locationManager.getDeviceLocation(isLocationPermissionGranted,
+            onFailureListener = {
+                displaySnackbar(resourceManager.getString(R.string.todo_no_location_information_available))
+            }, onPermissionDeniedListener = {
+                displaySnackbar(resourceManager.getString(R.string.todo_please_grant_location_permission))
+            }) { latitude, longitude ->
+            onSuccessListener(latitude, longitude)
+        }
+    }
 
     fun isDarkMode(): Boolean = sharedPreferencesManager.isDarkMode()
 
@@ -118,7 +133,7 @@ class HomeScreenViewModel(
 
     fun deleteTask(task: Task) {
         deleteTaskUseCase(task).onEach { resource ->
-            when(resource.status) {
+            when (resource.status) {
                 Status.SUCCESS -> {
                     val data = resource.data
                     if (data != null && data == 1) {
@@ -130,7 +145,8 @@ class HomeScreenViewModel(
 
                 Status.ERROR -> {
                     displaySnackbar("Task not deleted.")
-                    deleteTaskMutableState.value = DeleteTaskState(errorMessage = "Task not deleted.")
+                    deleteTaskMutableState.value =
+                        DeleteTaskState(errorMessage = "Task not deleted.")
                     getAllTaskByCompleteStatus(task.isComplete)
                 }
 
@@ -158,7 +174,7 @@ class HomeScreenViewModel(
 
                 Status.ERROR -> {
                     displaySnackbar("Task not updated.")
-                    taskMutableState.value =TaskState(errorMessage = "Task not updated.")
+                    taskMutableState.value = TaskState(errorMessage = "Task not updated.")
                     getAllTaskByCompleteStatus(!task.isComplete)
                 }
 
@@ -171,16 +187,20 @@ class HomeScreenViewModel(
 
     fun fetchTodayWeatherForecast(latitude: Double, longitude: Double) {
         fetchTodayWeatherForecastUseCase(latitude, longitude).onEach { resource ->
-            when(resource.status) {
+            when (resource.status) {
                 Status.SUCCESS -> {
                     val data = resource.data
                     if (data != null) {
-                        currentWeatherMutableState.value = CurrentWeatherState(currentWeatherResponse = data)
+                        currentWeatherMutableState.value =
+                            CurrentWeatherState(currentWeatherResponse = data)
                     }
                 }
+
                 Status.ERROR -> {
-                    currentWeatherMutableState.value = CurrentWeatherState(errorMessage = "Weather not found")
+                    currentWeatherMutableState.value =
+                        CurrentWeatherState(errorMessage = "Weather not found")
                 }
+
                 Status.LOADING -> {
                     currentWeatherMutableState.value = CurrentWeatherState(isLoading = true)
                 }

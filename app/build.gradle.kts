@@ -100,4 +100,8 @@ dependencies {
 
     //DataStore
     implementation(libs.androidx.datastore.preferences)
+
+    //Device Location
+    implementation(libs.play.services.location)
+    implementation(libs.huawei.location)
 }

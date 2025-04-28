@@ -1,5 +1,7 @@
 package za.co.todoapp.presentation.home
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -76,6 +78,7 @@ fun HomeScreen(
     tabItemList: List<TabItem>,
     snackbarHostState: SnackbarHostState,
     onCreate: () -> Unit,
+    onGetDeviceLocation: (isLocationPermissionGranted: Boolean) -> Unit,
     onDeleteTask: (task: Task) -> Unit,
     onCompleteTask: (task: Task) -> Unit,
     onUndoCompletedTask: (task: Task) -> Unit,
@@ -83,11 +86,17 @@ fun HomeScreen(
     onNavigateToTaskScreenClicked: () -> Unit,
     onNavigateToMenuScreenClicked: () -> Unit
 ) {
+    val locationPermissionLauncher =
+        rememberLauncherForActivityResult(contract = ActivityResultContracts.RequestPermission()) { isLocationPermissionGranted ->
+            onGetDeviceLocation(isLocationPermissionGranted)
+        }
+
     val scaffoldState = rememberBottomSheetScaffoldState();
     var selectedTabIndex by remember { mutableIntStateOf(0) }
     val horizontalPagerState = rememberPagerState { tabItemList.size }
     LaunchedEffect(Unit) {
         onCreate()
+        locationPermissionLauncher.launch(android.Manifest.permission.ACCESS_FINE_LOCATION)
     }
     LaunchedEffect(selectedTabIndex) {
         horizontalPagerState.animateScrollToPage(selectedTabIndex)
@@ -97,6 +106,8 @@ fun HomeScreen(
             selectedTabIndex = horizontalPagerState.currentPage
         }
     }
+
+
 
     BottomSheetScaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -156,7 +167,8 @@ fun HomeScreen(
                 )
 
                 if (currentWeatherState.value.currentWeatherResponse.forecast.forecastDayList.isNotEmpty()) {
-                    val forecastDay = currentWeatherState.value.currentWeatherResponse.forecast.forecastDayList.first()
+                    val forecastDay =
+                        currentWeatherState.value.currentWeatherResponse.forecast.forecastDayList.first()
                     Text(
                         modifier = modifier.padding(top = 8.dp),
                         text = "${forecastDay.day.maxTemperatureCelsius}℃ / ${forecastDay.day.minTemperatureCelsius}℃",
@@ -396,6 +408,7 @@ fun HomeScreenPreview() {
         ),
         snackbarHostState = SnackbarHostState(),
         onCreate = {},
+        onGetDeviceLocation = {},
         onDeleteTask = {},
         onCompleteTask = {},
         onUndoCompletedTask = {},
