@@ -3,6 +3,10 @@
 
     <!-- Home Screen -->
     <string name="todo_weather">Weather</string>
+    <string name="todo_sunrise">Sunrise</string>
+    <string name="todo_sunset">Sunset</string>
+    <string name="todo_no_location_information_available">No location information available.</string>
+    <string name="todo_please_grant_location_permission">Please grant location permission under settings to view weather information.</string>
 
     <!-- Task Screen -->
     <string name="todo_new_task">New Task</string>

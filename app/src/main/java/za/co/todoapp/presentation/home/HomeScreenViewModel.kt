@@ -5,7 +5,6 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.Create
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -14,22 +13,31 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import za.co.todoapp.R
 import za.co.todoapp.common.enum.Status
+import za.co.todoapp.common.services.location.LocationManager
 import za.co.todoapp.common.services.navigation.Destination
 import za.co.todoapp.common.services.navigation.Navigator
+import za.co.todoapp.common.services.preferences.sharedPreferences.SharedPreferencesManager
+import za.co.todoapp.common.services.resource.ResourceManager
 import za.co.todoapp.data.model.Task
+import za.co.todoapp.data.model.currentWeather.CurrentWeatherResponse
 import za.co.todoapp.domain.DeleteTaskUseCase
+import za.co.todoapp.domain.FetchTodayWeatherForecastUseCase
 import za.co.todoapp.domain.GetAllTaskByCompleteStatusUseCase
 import za.co.todoapp.domain.SaveOrUpdateTaskUseCase
 import za.co.todoapp.presentation.BaseViewModel
-import za.co.todoapp.presentation.task.TaskScreenViewModel.TaskState
 
 class HomeScreenViewModel(
     private val navigator: Navigator,
+    private val locationManager: LocationManager,
+    private val resourceManager: ResourceManager,
+    private val sharedPreferencesManager: SharedPreferencesManager,
     private val getAllTaskByCompleteStatusUseCase: GetAllTaskByCompleteStatusUseCase,
     private val deleteTaskUseCase: DeleteTaskUseCase,
-    private val saveOrUpdateTaskUseCase: SaveOrUpdateTaskUseCase
-): BaseViewModel() {
+    private val saveOrUpdateTaskUseCase: SaveOrUpdateTaskUseCase,
+    private val fetchTodayWeatherForecastUseCase: FetchTodayWeatherForecastUseCase
+) : BaseViewModel() {
     data class TabItem(
         val title: String,
         val unselectedIcon: ImageVector,
@@ -54,6 +62,15 @@ class HomeScreenViewModel(
     private val deleteTaskMutableState = mutableStateOf(DeleteTaskState())
     val deleteTaskState: State<DeleteTaskState> = deleteTaskMutableState
 
+    data class CurrentWeatherState(
+        val isLoading: Boolean = false,
+        val currentWeatherResponse: CurrentWeatherResponse = CurrentWeatherResponse(),
+        val errorMessage: String = ""
+    )
+
+    private val currentWeatherMutableState = mutableStateOf(CurrentWeatherState())
+    val currentWeatherState: State<CurrentWeatherState> = currentWeatherMutableState
+
     fun navigateToTaskScreen() = CoroutineScope(Dispatchers.IO).launch {
         navigator.navigate(destination = Destination.TaskScreen)
     }
@@ -74,6 +91,22 @@ class HomeScreenViewModel(
             selectedIcon = Icons.Filled.CheckCircle
         )
     )
+
+    fun getDeviceLocation(
+        isLocationPermissionGranted: Boolean,
+        onSuccessListener: (latitude: Double, longitude: Double) -> Unit
+    ) {
+        locationManager.getDeviceLocation(isLocationPermissionGranted,
+            onFailureListener = {
+                displaySnackbar(resourceManager.getString(R.string.todo_no_location_information_available))
+            }, onPermissionDeniedListener = {
+                displaySnackbar(resourceManager.getString(R.string.todo_please_grant_location_permission))
+            }) { latitude, longitude ->
+            onSuccessListener(latitude, longitude)
+        }
+    }
+
+    fun isDarkMode(): Boolean = sharedPreferencesManager.isDarkMode()
 
     fun getAllTaskByCompleteStatus(isComplete: Boolean) {
         getAllTaskByCompleteStatusUseCase(isComplete).onEach { resource ->
@@ -100,7 +133,7 @@ class HomeScreenViewModel(
 
     fun deleteTask(task: Task) {
         deleteTaskUseCase(task).onEach { resource ->
-            when(resource.status) {
+            when (resource.status) {
                 Status.SUCCESS -> {
                     val data = resource.data
                     if (data != null && data == 1) {
@@ -112,7 +145,8 @@ class HomeScreenViewModel(
 
                 Status.ERROR -> {
                     displaySnackbar("Task not deleted.")
-                    deleteTaskMutableState.value = DeleteTaskState(errorMessage = "Task not deleted.")
+                    deleteTaskMutableState.value =
+                        DeleteTaskState(errorMessage = "Task not deleted.")
                     getAllTaskByCompleteStatus(task.isComplete)
                 }
 
@@ -140,12 +174,35 @@ class HomeScreenViewModel(
 
                 Status.ERROR -> {
                     displaySnackbar("Task not updated.")
-                    taskMutableState.value =TaskState(errorMessage = "Task not updated.")
+                    taskMutableState.value = TaskState(errorMessage = "Task not updated.")
                     getAllTaskByCompleteStatus(!task.isComplete)
                 }
 
                 Status.LOADING -> {
                     taskMutableState.value = TaskState(isLoading = true)
+                }
+            }
+        }.launchIn(CoroutineScope(Dispatchers.IO))
+    }
+
+    fun fetchTodayWeatherForecast(latitude: Double, longitude: Double) {
+        fetchTodayWeatherForecastUseCase(latitude, longitude).onEach { resource ->
+            when (resource.status) {
+                Status.SUCCESS -> {
+                    val data = resource.data
+                    if (data != null) {
+                        currentWeatherMutableState.value =
+                            CurrentWeatherState(currentWeatherResponse = data)
+                    }
+                }
+
+                Status.ERROR -> {
+                    currentWeatherMutableState.value =
+                        CurrentWeatherState(errorMessage = "Weather not found")
+                }
+
+                Status.LOADING -> {
+                    currentWeatherMutableState.value = CurrentWeatherState(isLoading = true)
                 }
             }
         }.launchIn(CoroutineScope(Dispatchers.IO))

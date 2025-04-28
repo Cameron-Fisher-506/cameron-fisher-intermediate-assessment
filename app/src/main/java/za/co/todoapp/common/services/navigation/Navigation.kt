@@ -40,10 +40,17 @@ fun Navigation(
                 val homeScreenViewModel = koinInject<HomeScreenViewModel>()
                 HomeScreen(
                     taskState = homeScreenViewModel.taskState,
+                    currentWeatherState = homeScreenViewModel.currentWeatherState,
                     tabItemList = homeScreenViewModel.getTabItemList(),
                     snackbarHostState = homeScreenViewModel.snackbarHostState,
                     onCreate = {
+                        onCheckChangedDarkMode(homeScreenViewModel.isDarkMode())
                         homeScreenViewModel.getAllTaskByCompleteStatus(false)
+                    },
+                    onGetDeviceLocation = { isLocationPermissionGranted ->
+                        homeScreenViewModel.getDeviceLocation(isLocationPermissionGranted) { latitude, longitude ->
+                            homeScreenViewModel.fetchTodayWeatherForecast(latitude, longitude)
+                        }
                     },
                     onDeleteTask = { task ->
                         homeScreenViewModel.deleteTask(task)
@@ -76,6 +83,7 @@ fun Navigation(
                 ) { isDarkMode ->
                     onCheckChangedDarkMode(isDarkMode)
                     menuScreenViewModel.toggleDarkMode(isDarkMode)
+                    menuScreenViewModel.saveDarkMode(isDarkMode)
                 }
             }
 
