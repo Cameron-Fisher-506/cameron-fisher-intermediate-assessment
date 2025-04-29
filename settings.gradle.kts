@@ -8,6 +8,7 @@ pluginManagement {
             }
         }
         mavenCentral()
+        maven { url = uri("https://developer.huawei.com/repo/") }
         gradlePluginPortal()
     }
 }
@@ -16,8 +17,11 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        // Configure the Maven repository address for the HMS Core SDK.
+        maven { url = uri("https://developer.huawei.com/repo/") }
     }
 }
 
 rootProject.name = "TodoApp"
 include(":app")
+include(":composeCoreLib")
