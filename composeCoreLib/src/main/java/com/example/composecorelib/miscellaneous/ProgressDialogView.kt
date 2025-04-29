@@ -19,15 +19,13 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 
 @Composable
-fun ProgressDialog(
+fun ProgressDialogView(
     modifier: Modifier = Modifier,
     isLoading: Boolean = false
 ) {
-    var showDialog by remember { mutableStateOf(isLoading) }
-
-    if (showDialog) {
+    if (isLoading) {
         Dialog(
-            onDismissRequest = { showDialog = false },
+            onDismissRequest = {  },
             DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false)
         ) {
             Box(
@@ -44,6 +42,6 @@ fun ProgressDialog(
 
 @Preview
 @Composable
-fun ProgressDialogPreview() {
-    ProgressDialog(isLoading = true)
+fun ProgressDialogViewPreview() {
+    ProgressDialogView(isLoading = true)
 }

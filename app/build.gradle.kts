@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.serialization)
     alias(libs.plugins.ksp)
     alias(libs.plugins.room)
+    id("de.mannodermaus.android-junit5") version "1.12.0.0"
 }
 
 android {
@@ -104,4 +105,13 @@ dependencies {
     //Device Location
     implementation(libs.play.services.location)
     implementation(libs.huawei.location)
+
+    //JUnit 5
+    testImplementation(libs.junit.jupiter.api)
+    testRuntimeOnly(libs.junit.jupiter.engine)
+    testRuntimeOnly(libs.junit.vintage.engine)
+
+    //Mockk
+    testImplementation(libs.mockk.android)
+    testImplementation(libs.mockk.agent)
 }

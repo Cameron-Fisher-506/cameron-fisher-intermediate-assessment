@@ -7,7 +7,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import org.koin.core.component.getScopeName
 import za.co.todoapp.R
 import za.co.todoapp.common.enum.Status
 import za.co.todoapp.common.services.navigation.Navigator
@@ -39,7 +38,7 @@ class TaskScreenViewModel(
         navigator.navigateUp()
     }
 
-    fun validInputs() {
+    fun validateInputs() {
         when {
             taskName.value.isBlank() -> {
                 taskNameErrorMessage.value = resourceManager.getString(R.string.todo_please_provide_the_task_name)
@@ -63,16 +62,16 @@ class TaskScreenViewModel(
                     val data = resource.data
                     if (data != null) {
                         taskMutableState.value = TaskState(taskList = listOf(data))
-                        displaySnackbar("Task saved successfully.")
+                        displaySnackbar(resourceManager.getString(R.string.todo_task_saved_successfully))
                     } else {
-                        displaySnackbar("Task not saved.")
-                        taskMutableState.value = TaskState(errorMessage = "Task not saved.")
+                        displaySnackbar(resourceManager.getString(R.string.todo_task_not_saved))
+                        taskMutableState.value = TaskState(errorMessage = resourceManager.getString(R.string.todo_task_not_saved))
                     }
                 }
 
                 Status.ERROR -> {
-                    displaySnackbar("Task not saved.")
-                    taskMutableState.value = TaskState(errorMessage = "Task not saved.")
+                    displaySnackbar(resourceManager.getString(R.string.todo_task_not_saved))
+                    taskMutableState.value = TaskState(errorMessage = resourceManager.getString(R.string.todo_task_not_saved))
                 }
 
                 Status.LOADING -> {
