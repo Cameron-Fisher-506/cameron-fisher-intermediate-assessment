@@ -81,12 +81,12 @@ class HomeScreenViewModel(
 
     fun getTabItemList(): List<TabItem> = listOf(
         TabItem(
-            title = "To do",
+            title = resourceManager.getString(R.string.todo_todo),
             unselectedIcon = Icons.Outlined.Create,
             selectedIcon = Icons.Filled.Create
         ),
         TabItem(
-            title = "Completed",
+            title = resourceManager.getString(R.string.todo_complete),
             unselectedIcon = Icons.Outlined.CheckCircle,
             selectedIcon = Icons.Filled.CheckCircle
         )
@@ -116,12 +116,12 @@ class HomeScreenViewModel(
                     if (!data.isNullOrEmpty()) {
                         taskMutableState.value = TaskState(taskList = data)
                     } else {
-                        taskMutableState.value = TaskState(errorMessage = "No tasks available.")
+                        taskMutableState.value = TaskState(errorMessage = resourceManager.getString(R.string.todo_no_tasks_available))
                     }
                 }
 
                 Status.ERROR -> {
-                    taskMutableState.value = TaskState(errorMessage = "No tasks available.")
+                    taskMutableState.value = TaskState(errorMessage = resourceManager.getString(R.string.todo_no_tasks_available))
                 }
 
                 Status.LOADING -> {
@@ -137,16 +137,16 @@ class HomeScreenViewModel(
                 Status.SUCCESS -> {
                     val data = resource.data
                     if (data != null && data == 1) {
-                        displaySnackbar("Task deleted successfully.")
+                        displaySnackbar(resourceManager.getString(R.string.todo_task_deleted_successfully))
                         deleteTaskMutableState.value = DeleteTaskState(isDeleted = data)
                         getAllTaskByCompleteStatus(task.isComplete)
                     }
                 }
 
                 Status.ERROR -> {
-                    displaySnackbar("Task not deleted.")
+                    displaySnackbar(resourceManager.getString(R.string.todo_task_not_deleted))
                     deleteTaskMutableState.value =
-                        DeleteTaskState(errorMessage = "Task not deleted.")
+                        DeleteTaskState(errorMessage = resourceManager.getString(R.string.todo_task_not_deleted))
                     getAllTaskByCompleteStatus(task.isComplete)
                 }
 
@@ -164,17 +164,17 @@ class HomeScreenViewModel(
                     val data = resource.data
                     if (data != null) {
                         taskMutableState.value = TaskState(taskList = listOf(data))
-                        displaySnackbar("Task updated successfully.")
+                        displaySnackbar(resourceManager.getString(R.string.todo_task_updated_successfully))
                         getAllTaskByCompleteStatus(!task.isComplete)
                     } else {
-                        displaySnackbar("Task not updated.")
-                        taskMutableState.value = TaskState(errorMessage = "Task not updated.")
+                        displaySnackbar(resourceManager.getString(R.string.todo_task_not_updated))
+                        taskMutableState.value = TaskState(errorMessage = resourceManager.getString(R.string.todo_task_not_updated))
                     }
                 }
 
                 Status.ERROR -> {
-                    displaySnackbar("Task not updated.")
-                    taskMutableState.value = TaskState(errorMessage = "Task not updated.")
+                    displaySnackbar(resourceManager.getString(R.string.todo_task_not_updated))
+                    taskMutableState.value = TaskState(errorMessage = resourceManager.getString(R.string.todo_task_not_updated))
                     getAllTaskByCompleteStatus(!task.isComplete)
                 }
 
@@ -198,7 +198,7 @@ class HomeScreenViewModel(
 
                 Status.ERROR -> {
                     currentWeatherMutableState.value =
-                        CurrentWeatherState(errorMessage = "Weather not found")
+                        CurrentWeatherState(errorMessage = resourceManager.getString(R.string.todo_weather_information_not_found))
                 }
 
                 Status.LOADING -> {

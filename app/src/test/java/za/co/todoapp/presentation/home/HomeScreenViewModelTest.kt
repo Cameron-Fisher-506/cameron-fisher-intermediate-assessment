@@ -31,11 +31,24 @@ class HomeScreenViewModelTest {
     private val homeScreenViewModel = HomeScreenViewModel(navigator, locationManager, resourceManager, sharedPreferencesManager, getAllTaskByCompleteStatusUseCase, deleteTaskUseCase, saveOrUpdateTaskUseCase, fetchTodayWeatherForecastUseCase)
 
     @Test
-    @DisplayName("Get Tab Item List")
-    fun shouldReturnListWhenGetTabItemListIsCalled() {
+    @DisplayName("Get Tab Item List - To do")
+    fun shouldReturnListTodoWhenGetTabItemListIsCalled() {
+        every { resourceManager.getString(any()) } returns "To do"
+
         val tabItemList = homeScreenViewModel.getTabItemList()
+
         assertTrue(tabItemList.size == 2)
         assertEquals("To do", tabItemList.first().title)
+    }
+
+    @Test
+    @DisplayName("Get Tab Item List - Completed")
+    fun shouldReturnListCompletedWhenGetTabItemListIsCalled() {
+        every { resourceManager.getString(any()) } returns "Completed"
+
+        val tabItemList = homeScreenViewModel.getTabItemList()
+
+        assertTrue(tabItemList.size == 2)
         assertEquals("Completed", tabItemList.last().title)
     }
 

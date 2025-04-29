@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import kotlinx.coroutines.flow.flow
 import za.co.todoapp.common.utilities.Resource
 import za.co.todoapp.data.model.Task
 
@@ -31,17 +30,6 @@ abstract class ApplicationDatabase: RoomDatabase() {
                     INSTANCE = instance
                     return instance
                 }
-            }
-        }
-
-        inline fun <T> getFlowResource(crossinline daoCall: suspend () -> T) = flow<Resource<T>> {
-            emit(Resource.loading())
-
-            val value = daoCall.invoke()
-            if (value != null) {
-                emit(Resource.success(value))
-            } else {
-                emit(Resource.error("Not cached"))
             }
         }
 
