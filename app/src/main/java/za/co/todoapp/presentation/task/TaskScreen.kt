@@ -3,7 +3,6 @@ package za.co.todoapp.presentation.task
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.icons.Icons
@@ -21,6 +20,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -29,12 +29,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.composecorelib.buttons.ButtonView
 import com.example.composecorelib.buttons.CustomInputView
+import com.example.composecorelib.miscellaneous.ProgressDialogView
 import za.co.todoapp.R
+import za.co.todoapp.presentation.task.TaskScreenViewModel.TaskState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TaskScreen(
     modifier: Modifier = Modifier,
+    taskState: State<TaskState>,
     taskName: MutableState<String>,
     taskDescription: MutableState<String>,
     taskNameErrorMessage: MutableState<String>,
@@ -70,6 +73,7 @@ fun TaskScreen(
         }) { padding ->
         Surface(modifier = modifier.padding(padding)) {
             Column(modifier = modifier.fillMaxSize()) {
+                ProgressDialogView(isLoading = taskState.value.isLoading)
                 CustomInputView(
                     title = stringResource(R.string.todo_task),
                     placeholder = stringResource(R.string.todo_task_hint),
@@ -103,6 +107,7 @@ fun TaskScreen(
 @Composable
 fun TaskScreenPreview() {
     TaskScreen(
+        taskState = remember { mutableStateOf(TaskState()) },
         taskName = remember { mutableStateOf("") },
         taskDescription = remember { mutableStateOf("") },
         taskNameErrorMessage = remember { mutableStateOf("") },
