@@ -62,16 +62,16 @@ class TaskScreenViewModel(
                     val data = resource.data
                     if (data != null) {
                         taskMutableState.value = TaskState(taskList = listOf(data))
-                        displaySnackbar("Task saved successfully.")
+                        displaySnackbar(resourceManager.getString(R.string.todo_task_saved_successfully))
                     } else {
-                        displaySnackbar("Task not saved.")
-                        taskMutableState.value = TaskState(errorMessage = "Task not saved.")
+                        displaySnackbar(resourceManager.getString(R.string.todo_task_not_saved))
+                        taskMutableState.value = TaskState(errorMessage = resourceManager.getString(R.string.todo_task_not_saved))
                     }
                 }
 
                 Status.ERROR -> {
-                    displaySnackbar("Task not saved.")
-                    taskMutableState.value = TaskState(errorMessage = "Task not saved.")
+                    displaySnackbar(resourceManager.getString(R.string.todo_task_not_saved))
+                    taskMutableState.value = TaskState(errorMessage = resourceManager.getString(R.string.todo_task_not_saved))
                 }
 
                 Status.LOADING -> {
