@@ -40,6 +40,7 @@ fun Navigation(
                 val homeScreenViewModel = koinInject<HomeScreenViewModel>()
                 HomeScreen(
                     taskState = homeScreenViewModel.taskState,
+                    deleteTaskState = homeScreenViewModel.deleteTaskState,
                     currentWeatherState = homeScreenViewModel.currentWeatherState,
                     tabItemList = homeScreenViewModel.getTabItemList(),
                     snackbarHostState = homeScreenViewModel.snackbarHostState,
@@ -90,6 +91,7 @@ fun Navigation(
             composable<Destination.TaskScreen> {
                 val taskScreenViewModel = koinInject<TaskScreenViewModel>()
                 TaskScreen(
+                    taskState = taskScreenViewModel.taskState,
                     taskName = taskScreenViewModel.taskName,
                     taskDescription = taskScreenViewModel.taskDescription,
                     taskNameErrorMessage = taskScreenViewModel.taskNameErrorMessage,

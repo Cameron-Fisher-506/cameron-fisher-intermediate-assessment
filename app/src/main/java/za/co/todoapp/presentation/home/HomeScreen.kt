@@ -56,6 +56,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.composecorelib.buttons.CustomCardView
+import com.example.composecorelib.miscellaneous.ProgressDialogView
 import za.co.todoapp.data.model.Task
 import za.co.todoapp.data.model.currentWeather.CurrentWeatherResponse
 import za.co.todoapp.data.model.currentWeather.dto.Astro
@@ -68,12 +69,14 @@ import za.co.todoapp.data.model.currentWeather.dto.Location
 import za.co.todoapp.presentation.home.HomeScreenViewModel.CurrentWeatherState
 import za.co.todoapp.presentation.home.HomeScreenViewModel.TabItem
 import za.co.todoapp.presentation.home.HomeScreenViewModel.TaskState
+import za.co.todoapp.presentation.home.HomeScreenViewModel.DeleteTaskState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
     taskState: State<TaskState>,
+    deleteTaskState: State<DeleteTaskState>,
     currentWeatherState: State<CurrentWeatherState>,
     tabItemList: List<TabItem>,
     snackbarHostState: SnackbarHostState,
@@ -199,6 +202,7 @@ fun HomeScreen(
             Column(
                 modifier = modifier.fillMaxSize()
             ) {
+                ProgressDialogView(isLoading = taskState.value.isLoading || deleteTaskState.value.isLoading || currentWeatherState.value.isLoading)
                 TabRow(selectedTabIndex = selectedTabIndex) {
                     tabItemList.forEachIndexed { index, tabItem ->
                         Tab(
@@ -362,6 +366,7 @@ fun HomeScreenPreview() {
                 )
             )
         },
+        deleteTaskState = remember { mutableStateOf(DeleteTaskState()) },
         currentWeatherState = remember {
             mutableStateOf(
                 CurrentWeatherState(

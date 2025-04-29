@@ -7,7 +7,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import org.koin.core.component.getScopeName
 import za.co.todoapp.R
 import za.co.todoapp.common.enum.Status
 import za.co.todoapp.common.services.navigation.Navigator
