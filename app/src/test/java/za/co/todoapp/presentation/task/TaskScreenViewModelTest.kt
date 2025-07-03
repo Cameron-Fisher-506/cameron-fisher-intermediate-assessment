@@ -12,7 +12,7 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import za.co.todoapp.common.services.navigation.Navigator
 import za.co.todoapp.common.services.resource.ResourceManager
-import za.co.todoapp.data.model.Task
+import za.co.todoapp.data.model.entity.Task
 import za.co.todoapp.domain.SaveOrUpdateTaskUseCase
 
 class TaskScreenViewModelTest {

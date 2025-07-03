@@ -2,7 +2,7 @@ package za.co.todoapp.data.repository
 
 import za.co.todoapp.common.utilities.Resource
 import za.co.todoapp.data.dataSource.TaskLocalDataSource
-import za.co.todoapp.data.model.Task
+import za.co.todoapp.data.model.entity.Task
 
 class TaskRepository(
     private val taskLocalDataSource: TaskLocalDataSource

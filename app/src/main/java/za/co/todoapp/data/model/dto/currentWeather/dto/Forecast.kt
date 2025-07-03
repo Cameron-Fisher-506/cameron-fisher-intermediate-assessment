@@ -1,4 +1,4 @@
-package za.co.todoapp.data.model.currentWeather.dto
+package za.co.todoapp.data.model.dto.currentWeather.dto
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

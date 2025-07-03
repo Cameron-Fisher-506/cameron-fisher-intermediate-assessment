@@ -2,7 +2,7 @@ package za.co.todoapp.data.local
 
 import androidx.room.Dao
 import androidx.room.Query
-import za.co.todoapp.data.model.Task
+import za.co.todoapp.data.model.entity.Task
 
 @Dao
 interface ITaskDao: IBaseDao<Task> {

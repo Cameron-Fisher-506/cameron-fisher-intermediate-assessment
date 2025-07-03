@@ -1,4 +1,4 @@
-package za.co.todoapp.data.model
+package za.co.todoapp.data.model.entity
 
 import androidx.room.Entity
 import androidx.room.Index
