@@ -1,16 +1,16 @@
-package za.co.todoapp.domain
+package za.co.todoapp.domain.usecase
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import za.co.todoapp.common.utilities.Resource
-import za.co.todoapp.data.model.Task
+import za.co.todoapp.data.model.entity.TaskEntity
 import za.co.todoapp.data.repository.TaskRepository
 
-class DeleteTaskUseCase(
+class SaveOrUpdateTaskUseCase(
     private val taskRepository: TaskRepository
 ) {
-    operator fun invoke(task: Task): Flow<Resource<Int>> = flow {
+    operator fun invoke(taskEntity: TaskEntity): Flow<Resource<TaskEntity>> = flow {
         emit(Resource.loading())
-        emit(taskRepository.delete(task))
+        emit(taskRepository.upsert(taskEntity))
     }
 }

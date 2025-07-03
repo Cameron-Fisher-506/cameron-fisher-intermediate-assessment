@@ -11,8 +11,8 @@ import za.co.todoapp.R
 import za.co.todoapp.common.enum.Status
 import za.co.todoapp.common.services.navigation.Navigator
 import za.co.todoapp.common.services.resource.ResourceManager
-import za.co.todoapp.data.model.Task
-import za.co.todoapp.domain.SaveOrUpdateTaskUseCase
+import za.co.todoapp.data.model.entity.TaskEntity
+import za.co.todoapp.domain.usecase.SaveOrUpdateTaskUseCase
 import za.co.todoapp.presentation.BaseViewModel
 
 class TaskScreenViewModel(
@@ -22,7 +22,7 @@ class TaskScreenViewModel(
 ): BaseViewModel() {
     data class TaskState(
         val isLoading: Boolean = false,
-        val taskList: List<Task> = emptyList(),
+        val taskEntityList: List<TaskEntity> = emptyList(),
         val errorMessage: String = ""
     )
 
@@ -47,7 +47,7 @@ class TaskScreenViewModel(
                 taskDescriptionErrorMessage.value = resourceManager.getString(R.string.todo_please_provide_a_brief_description)
             }
             else -> {
-                saveNewTask(Task().apply {
+                saveNewTask(TaskEntity().apply {
                     title = taskName.value
                     description = taskDescription.value
                 })
@@ -55,13 +55,13 @@ class TaskScreenViewModel(
         }
     }
 
-    private fun saveNewTask(task: Task) {
-        saveOrUpdateTaskUseCase(task).onEach { resource ->
+    private fun saveNewTask(taskEntity: TaskEntity) {
+        saveOrUpdateTaskUseCase(taskEntity).onEach { resource ->
             when (resource.status) {
                 Status.SUCCESS -> {
                     val data = resource.data
                     if (data != null) {
-                        taskMutableState.value = TaskState(taskList = listOf(data))
+                        taskMutableState.value = TaskState(taskEntityList = listOf(data))
                         displaySnackbar(resourceManager.getString(R.string.todo_task_saved_successfully))
                     } else {
                         displaySnackbar(resourceManager.getString(R.string.todo_task_not_saved))

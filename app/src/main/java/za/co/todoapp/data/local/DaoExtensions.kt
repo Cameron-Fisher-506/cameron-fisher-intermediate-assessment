@@ -1,15 +1,15 @@
 package za.co.todoapp.data.local
 
-suspend fun <T> IBaseDao<T>.upsert(entity: T, baseDao: IBaseDao<T>): T {
-    val result = baseDao.insert(entity)
+suspend infix fun <T> IBaseDao<T>.upsert(entity: T): T {
+    val result = this.insert(entity)
     if (result == -1L) {
-        baseDao.update(entity)
+        this.update(entity)
     }
     return entity
 }
 
-suspend fun <T> IBaseDao<T>.upsert(entities: List<T>, baseDao: IBaseDao<T>): List<T> {
-    val results = baseDao.insert(entities)
+suspend infix fun <T> IBaseDao<T>.upsert(entities: List<T>): List<T> {
+    val results = this.insert(entities)
     val updateList: MutableList<T> = mutableListOf()
 
     for (i in results.indices) {
@@ -19,7 +19,7 @@ suspend fun <T> IBaseDao<T>.upsert(entities: List<T>, baseDao: IBaseDao<T>): Lis
     }
 
     if (updateList.isNotEmpty()) {
-        baseDao.update(updateList)
+        this.update(updateList)
     }
 
     return entities

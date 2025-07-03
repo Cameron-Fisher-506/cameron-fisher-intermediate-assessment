@@ -1,9 +1,9 @@
-package za.co.todoapp.data.model.currentWeather.dto
+package za.co.todoapp.data.model.dto.currentWeather.dto
 
 import kotlinx.serialization.Serializable
 
 @Serializable
-class Astro(
+class AstroDto(
     val sunrise: String = "",
     val sunset: String = ""
 )

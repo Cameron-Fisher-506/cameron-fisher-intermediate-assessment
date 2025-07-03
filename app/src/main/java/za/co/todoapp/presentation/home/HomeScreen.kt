@@ -57,19 +57,20 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.composecorelib.buttons.CustomCardView
 import com.example.composecorelib.miscellaneous.ProgressDialogView
-import za.co.todoapp.data.model.Task
-import za.co.todoapp.data.model.currentWeather.CurrentWeatherResponse
-import za.co.todoapp.data.model.currentWeather.dto.Astro
-import za.co.todoapp.data.model.currentWeather.dto.Condition
-import za.co.todoapp.data.model.currentWeather.dto.Current
-import za.co.todoapp.data.model.currentWeather.dto.Day
-import za.co.todoapp.data.model.currentWeather.dto.Forecast
-import za.co.todoapp.data.model.currentWeather.dto.ForecastDay
-import za.co.todoapp.data.model.currentWeather.dto.Location
+import za.co.todoapp.data.model.entity.TaskEntity
+import za.co.todoapp.data.model.dto.currentWeather.CurrentWeatherResponse
+import za.co.todoapp.data.model.dto.currentWeather.dto.AstroDto
+import za.co.todoapp.data.model.dto.currentWeather.dto.ConditionDto
+import za.co.todoapp.data.model.dto.currentWeather.dto.CurrentDto
+import za.co.todoapp.data.model.dto.currentWeather.dto.DayDto
+import za.co.todoapp.data.model.dto.currentWeather.dto.ForecastDto
+import za.co.todoapp.data.model.dto.currentWeather.dto.ForecastDayDto
+import za.co.todoapp.data.model.dto.currentWeather.dto.LocationDto
 import za.co.todoapp.presentation.home.HomeScreenViewModel.CurrentWeatherState
 import za.co.todoapp.presentation.home.HomeScreenViewModel.TabItem
 import za.co.todoapp.presentation.home.HomeScreenViewModel.TaskState
 import za.co.todoapp.presentation.home.HomeScreenViewModel.DeleteTaskState
+import za.co.todoapp.presentation.model.TodayWeatherForecastUiModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -82,9 +83,9 @@ fun HomeScreen(
     snackbarHostState: SnackbarHostState,
     onCreate: () -> Unit,
     onGetDeviceLocation: (isLocationPermissionGranted: Boolean) -> Unit,
-    onDeleteTask: (task: Task) -> Unit,
-    onCompleteTask: (task: Task) -> Unit,
-    onUndoCompletedTask: (task: Task) -> Unit,
+    onDeleteTask: (taskEntity: TaskEntity) -> Unit,
+    onCompleteTask: (taskEntity: TaskEntity) -> Unit,
+    onUndoCompletedTask: (taskEntity: TaskEntity) -> Unit,
     onTaskTabClicked: (isComplete: Boolean) -> Unit,
     onNavigateToTaskScreenClicked: () -> Unit,
     onNavigateToMenuScreenClicked: () -> Unit
@@ -148,7 +149,7 @@ fun HomeScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = currentWeatherState.value.currentWeatherResponse.location.name,
+                        text = currentWeatherState.value.todayWeatherForecastUiModel.locationName,
                         fontSize = 16.sp,
                         style = MaterialTheme.typography.bodyLarge
                     )
@@ -161,33 +162,29 @@ fun HomeScreen(
 
                 Text(
                     modifier = modifier.padding(top = 8.dp),
-                    text = "${currentWeatherState.value.currentWeatherResponse.current.temperatureCelsius}℃",
+                    text = "${currentWeatherState.value.todayWeatherForecastUiModel.temperatureCelsius}℃",
                     fontWeight = FontWeight.Bold,
                     fontSize = 64.sp,
                     style = MaterialTheme.typography.titleLarge
                 )
 
-                if (currentWeatherState.value.currentWeatherResponse.forecast.forecastDayList.isNotEmpty()) {
-                    val forecastDay =
-                        currentWeatherState.value.currentWeatherResponse.forecast.forecastDayList.first()
-                    Text(
-                        modifier = modifier.padding(top = 8.dp),
-                        text = "${forecastDay.day.maxTemperatureCelsius}℃ / ${forecastDay.day.minTemperatureCelsius}℃",
-                        fontSize = 16.sp,
-                        style = MaterialTheme.typography.bodyLarge
-                    )
-
-                    Text(
-                        modifier = modifier.padding(top = 8.dp),
-                        text = "Sunrise ${forecastDay.astro.sunrise} / Sunset ${forecastDay.astro.sunset}",
-                        fontSize = 16.sp,
-                        style = MaterialTheme.typography.bodyLarge
-                    )
-                }
+                Text(
+                    modifier = modifier.padding(top = 8.dp),
+                    text = "${currentWeatherState.value.todayWeatherForecastUiModel.maxTemperatureCelsius}℃ / ${currentWeatherState.value.todayWeatherForecastUiModel.minTemperatureCelsius}℃",
+                    fontSize = 16.sp,
+                    style = MaterialTheme.typography.bodyLarge
+                )
 
                 Text(
                     modifier = modifier.padding(top = 8.dp),
-                    text = currentWeatherState.value.currentWeatherResponse.current.condition.text,
+                    text = "Sunrise ${currentWeatherState.value.todayWeatherForecastUiModel.sunrise} / Sunset ${currentWeatherState.value.todayWeatherForecastUiModel.sunset}",
+                    fontSize = 16.sp,
+                    style = MaterialTheme.typography.bodyLarge
+                )
+
+                Text(
+                    modifier = modifier.padding(top = 8.dp),
+                    text = currentWeatherState.value.todayWeatherForecastUiModel.condition,
                     fontSize = 16.sp,
                     style = MaterialTheme.typography.bodyLarge
                 )
@@ -231,7 +228,7 @@ fun HomeScreen(
                         val listState = rememberLazyListState()
                         LazyColumn(state = listState) {
                             itemsIndexed(
-                                items = taskState.value.taskList,
+                                items = taskState.value.taskEntityList,
                                 key = { _, task ->
                                     task.id
                                 }
@@ -290,7 +287,7 @@ fun HomeScreen(
                         val listState = rememberLazyListState()
                         LazyColumn(state = listState) {
                             itemsIndexed(
-                                items = taskState.value.taskList,
+                                items = taskState.value.taskEntityList,
                                 key = { _, task ->
                                     task.id
                                 }
@@ -362,7 +359,7 @@ fun HomeScreenPreview() {
         taskState = remember {
             mutableStateOf(
                 TaskState(
-                    taskList = listOf(Task(title = "Title", description = "Description"))
+                    taskEntityList = listOf(TaskEntity(title = "Title", description = "Description"))
                 )
             )
         },
@@ -370,29 +367,14 @@ fun HomeScreenPreview() {
         currentWeatherState = remember {
             mutableStateOf(
                 CurrentWeatherState(
-                    currentWeatherResponse = CurrentWeatherResponse(
-                        location = Location(name = "Johannesburg"),
-                        current = Current(
-                            temperatureCelsius = 20.0,
-                            condition = Condition(
-                                text = "Sunny",
-                                icon = "//cdn.weatherapi.com/weather/64x64/day/113.png"
-                            )
-                        ),
-                        forecast = Forecast(
-                            forecastDayList = listOf(
-                                ForecastDay(
-                                    day = Day(
-                                        maxTemperatureCelsius = 25.0,
-                                        minTemperatureCelsius = 12.0
-                                    ),
-                                    astro = Astro(
-                                        sunrise = "06:00",
-                                        sunset = "17:00"
-                                    )
-                                )
-                            )
-                        )
+                    todayWeatherForecastUiModel = TodayWeatherForecastUiModel(
+                        locationName = "Johannesburg",
+                        maxTemperatureCelsius = 0.0,
+                        minTemperatureCelsius = 0.0,
+                        condition = "Sunny",
+                        sunset = "17:00",
+                        sunrise = "06:00",
+                        temperatureCelsius = 0.0
                     )
                 )
             )

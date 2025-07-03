@@ -20,13 +20,15 @@ import za.co.todoapp.common.services.navigation.Destination
 import za.co.todoapp.common.services.navigation.Navigator
 import za.co.todoapp.common.services.preferences.sharedPreferences.SharedPreferencesManager
 import za.co.todoapp.common.services.resource.ResourceManager
-import za.co.todoapp.data.model.Task
-import za.co.todoapp.data.model.currentWeather.CurrentWeatherResponse
-import za.co.todoapp.domain.DeleteTaskUseCase
-import za.co.todoapp.domain.FetchTodayWeatherForecastUseCase
-import za.co.todoapp.domain.GetAllTaskByCompleteStatusUseCase
-import za.co.todoapp.domain.SaveOrUpdateTaskUseCase
+import za.co.todoapp.data.model.entity.TaskEntity
+import za.co.todoapp.data.model.dto.currentWeather.CurrentWeatherResponse
+import za.co.todoapp.domain.usecase.DeleteTaskUseCase
+import za.co.todoapp.domain.usecase.FetchTodayWeatherForecastUseCase
+import za.co.todoapp.domain.usecase.GetAllTaskByCompleteStatusUseCase
+import za.co.todoapp.domain.usecase.SaveOrUpdateTaskUseCase
 import za.co.todoapp.presentation.BaseViewModel
+import za.co.todoapp.presentation.mapper.TodayWeatherForecastDomainUiMapper
+import za.co.todoapp.presentation.model.TodayWeatherForecastUiModel
 
 class HomeScreenViewModel(
     private val navigator: Navigator,
@@ -46,7 +48,7 @@ class HomeScreenViewModel(
 
     data class TaskState(
         val isLoading: Boolean = false,
-        val taskList: List<Task> = emptyList(),
+        val taskEntityList: List<TaskEntity> = emptyList(),
         val errorMessage: String = ""
     )
 
@@ -64,7 +66,7 @@ class HomeScreenViewModel(
 
     data class CurrentWeatherState(
         val isLoading: Boolean = false,
-        val currentWeatherResponse: CurrentWeatherResponse = CurrentWeatherResponse(),
+        val todayWeatherForecastUiModel: TodayWeatherForecastUiModel = TodayWeatherForecastUiModel(),
         val errorMessage: String = ""
     )
 
@@ -114,7 +116,7 @@ class HomeScreenViewModel(
                 Status.SUCCESS -> {
                     val data = resource.data
                     if (!data.isNullOrEmpty()) {
-                        taskMutableState.value = TaskState(taskList = data)
+                        taskMutableState.value = TaskState(taskEntityList = data)
                     } else {
                         taskMutableState.value = TaskState(errorMessage = resourceManager.getString(R.string.todo_no_tasks_available))
                     }
@@ -131,15 +133,15 @@ class HomeScreenViewModel(
         }.launchIn(CoroutineScope(Dispatchers.IO))
     }
 
-    fun deleteTask(task: Task) {
-        deleteTaskUseCase(task).onEach { resource ->
+    fun deleteTask(taskEntity: TaskEntity) {
+        deleteTaskUseCase(taskEntity).onEach { resource ->
             when (resource.status) {
                 Status.SUCCESS -> {
                     val data = resource.data
                     if (data != null && data == 1) {
                         displaySnackbar(resourceManager.getString(R.string.todo_task_deleted_successfully))
                         deleteTaskMutableState.value = DeleteTaskState(isDeleted = data)
-                        getAllTaskByCompleteStatus(task.isComplete)
+                        getAllTaskByCompleteStatus(taskEntity.isComplete)
                     }
                 }
 
@@ -147,7 +149,7 @@ class HomeScreenViewModel(
                     displaySnackbar(resourceManager.getString(R.string.todo_task_not_deleted))
                     deleteTaskMutableState.value =
                         DeleteTaskState(errorMessage = resourceManager.getString(R.string.todo_task_not_deleted))
-                    getAllTaskByCompleteStatus(task.isComplete)
+                    getAllTaskByCompleteStatus(taskEntity.isComplete)
                 }
 
                 Status.LOADING -> {
@@ -157,15 +159,15 @@ class HomeScreenViewModel(
         }.launchIn(CoroutineScope(Dispatchers.IO))
     }
 
-    fun updateTaskCompleteStatus(task: Task) {
-        saveOrUpdateTaskUseCase(task).onEach { resource ->
+    fun updateTaskCompleteStatus(taskEntity: TaskEntity) {
+        saveOrUpdateTaskUseCase(taskEntity).onEach { resource ->
             when (resource.status) {
                 Status.SUCCESS -> {
                     val data = resource.data
                     if (data != null) {
-                        taskMutableState.value = TaskState(taskList = listOf(data))
+                        taskMutableState.value = TaskState(taskEntityList = listOf(data))
                         displaySnackbar(resourceManager.getString(R.string.todo_task_updated_successfully))
-                        getAllTaskByCompleteStatus(!task.isComplete)
+                        getAllTaskByCompleteStatus(!taskEntity.isComplete)
                     } else {
                         displaySnackbar(resourceManager.getString(R.string.todo_task_not_updated))
                         taskMutableState.value = TaskState(errorMessage = resourceManager.getString(R.string.todo_task_not_updated))
@@ -175,7 +177,7 @@ class HomeScreenViewModel(
                 Status.ERROR -> {
                     displaySnackbar(resourceManager.getString(R.string.todo_task_not_updated))
                     taskMutableState.value = TaskState(errorMessage = resourceManager.getString(R.string.todo_task_not_updated))
-                    getAllTaskByCompleteStatus(!task.isComplete)
+                    getAllTaskByCompleteStatus(!taskEntity.isComplete)
                 }
 
                 Status.LOADING -> {
@@ -186,13 +188,14 @@ class HomeScreenViewModel(
     }
 
     fun fetchTodayWeatherForecast(latitude: Double, longitude: Double) {
+        val todayWeatherForecastDomainUiMapper = TodayWeatherForecastDomainUiMapper()
         fetchTodayWeatherForecastUseCase(latitude, longitude).onEach { resource ->
             when (resource.status) {
                 Status.SUCCESS -> {
                     val data = resource.data
                     if (data != null) {
                         currentWeatherMutableState.value =
-                            CurrentWeatherState(currentWeatherResponse = data)
+                            CurrentWeatherState(todayWeatherForecastUiModel = todayWeatherForecastDomainUiMapper.map(data))
                     }
                 }
 
