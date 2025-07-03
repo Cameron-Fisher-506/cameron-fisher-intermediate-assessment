@@ -12,10 +12,10 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import za.co.todoapp.common.services.navigation.Navigator
 import za.co.todoapp.common.services.resource.ResourceManager
-import za.co.todoapp.data.model.entity.Task
+import za.co.todoapp.data.model.entity.TaskEntity
 import za.co.todoapp.domain.SaveOrUpdateTaskUseCase
 
-class TaskScreenViewModelTest {
+class TaskEntityScreenViewModelTest {
     private val navigator = mockk<Navigator>()
     private val resourceManager = mockk<ResourceManager>()
     private val saveOrUpdateTaskUseCase = mockk<SaveOrUpdateTaskUseCase>()
@@ -65,12 +65,12 @@ class TaskScreenViewModelTest {
     @Test
     @DisplayName("Validate Inputs - Save New Task")
     fun shouldCallSaveNewTaskWhenValidateInputsIsCalled() {
-        every { saveOrUpdateTaskUseCase(any<Task>()) } returns flow {}
+        every { saveOrUpdateTaskUseCase(any<TaskEntity>()) } returns flow {}
 
         taskScreenViewModel.taskName.value = "Shopping"
         taskScreenViewModel.taskDescription.value = "Chicken, Eggs and Bread"
         taskScreenViewModel.validateInputs()
 
-        verify(exactly = 1) { saveOrUpdateTaskUseCase.invoke(any<Task>()) }
+        verify(exactly = 1) { saveOrUpdateTaskUseCase.invoke(any<TaskEntity>()) }
     }
 }

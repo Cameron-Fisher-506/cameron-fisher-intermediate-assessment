@@ -4,7 +4,8 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-class Forecast(
-    @SerialName("forecastday")
-    val forecastDayList: List<ForecastDay> = emptyList()
+class CurrentDto(
+    @SerialName("temp_c")
+    val temperatureCelsius: Double = 0.0,
+    val conditionDto: ConditionDto = ConditionDto()
 )

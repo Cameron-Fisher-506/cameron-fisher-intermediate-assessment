@@ -57,15 +57,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.composecorelib.buttons.CustomCardView
 import com.example.composecorelib.miscellaneous.ProgressDialogView
-import za.co.todoapp.data.model.entity.Task
+import za.co.todoapp.data.model.entity.TaskEntity
 import za.co.todoapp.data.model.dto.currentWeather.CurrentWeatherResponse
-import za.co.todoapp.data.model.dto.currentWeather.dto.Astro
-import za.co.todoapp.data.model.dto.currentWeather.dto.Condition
-import za.co.todoapp.data.model.dto.currentWeather.dto.Current
-import za.co.todoapp.data.model.dto.currentWeather.dto.Day
-import za.co.todoapp.data.model.dto.currentWeather.dto.Forecast
-import za.co.todoapp.data.model.dto.currentWeather.dto.ForecastDay
-import za.co.todoapp.data.model.dto.currentWeather.dto.Location
+import za.co.todoapp.data.model.dto.currentWeather.dto.AstroDto
+import za.co.todoapp.data.model.dto.currentWeather.dto.ConditionDto
+import za.co.todoapp.data.model.dto.currentWeather.dto.CurrentDto
+import za.co.todoapp.data.model.dto.currentWeather.dto.DayDto
+import za.co.todoapp.data.model.dto.currentWeather.dto.ForecastDto
+import za.co.todoapp.data.model.dto.currentWeather.dto.ForecastDayDto
+import za.co.todoapp.data.model.dto.currentWeather.dto.LocationDto
 import za.co.todoapp.presentation.home.HomeScreenViewModel.CurrentWeatherState
 import za.co.todoapp.presentation.home.HomeScreenViewModel.TabItem
 import za.co.todoapp.presentation.home.HomeScreenViewModel.TaskState
@@ -82,9 +82,9 @@ fun HomeScreen(
     snackbarHostState: SnackbarHostState,
     onCreate: () -> Unit,
     onGetDeviceLocation: (isLocationPermissionGranted: Boolean) -> Unit,
-    onDeleteTask: (task: Task) -> Unit,
-    onCompleteTask: (task: Task) -> Unit,
-    onUndoCompletedTask: (task: Task) -> Unit,
+    onDeleteTask: (taskEntity: TaskEntity) -> Unit,
+    onCompleteTask: (taskEntity: TaskEntity) -> Unit,
+    onUndoCompletedTask: (taskEntity: TaskEntity) -> Unit,
     onTaskTabClicked: (isComplete: Boolean) -> Unit,
     onNavigateToTaskScreenClicked: () -> Unit,
     onNavigateToMenuScreenClicked: () -> Unit
@@ -161,25 +161,25 @@ fun HomeScreen(
 
                 Text(
                     modifier = modifier.padding(top = 8.dp),
-                    text = "${currentWeatherState.value.currentWeatherResponse.current.temperatureCelsius}℃",
+                    text = "${currentWeatherState.value.currentWeatherResponse.currentDto.temperatureCelsius}℃",
                     fontWeight = FontWeight.Bold,
                     fontSize = 64.sp,
                     style = MaterialTheme.typography.titleLarge
                 )
 
-                if (currentWeatherState.value.currentWeatherResponse.forecast.forecastDayList.isNotEmpty()) {
+                if (currentWeatherState.value.currentWeatherResponse.forecastDto.forecastDayDtoList.isNotEmpty()) {
                     val forecastDay =
-                        currentWeatherState.value.currentWeatherResponse.forecast.forecastDayList.first()
+                        currentWeatherState.value.currentWeatherResponse.forecastDto.forecastDayDtoList.first()
                     Text(
                         modifier = modifier.padding(top = 8.dp),
-                        text = "${forecastDay.day.maxTemperatureCelsius}℃ / ${forecastDay.day.minTemperatureCelsius}℃",
+                        text = "${forecastDay.dayDto.maxTemperatureCelsius}℃ / ${forecastDay.dayDto.minTemperatureCelsius}℃",
                         fontSize = 16.sp,
                         style = MaterialTheme.typography.bodyLarge
                     )
 
                     Text(
                         modifier = modifier.padding(top = 8.dp),
-                        text = "Sunrise ${forecastDay.astro.sunrise} / Sunset ${forecastDay.astro.sunset}",
+                        text = "Sunrise ${forecastDay.astroDto.sunrise} / Sunset ${forecastDay.astroDto.sunset}",
                         fontSize = 16.sp,
                         style = MaterialTheme.typography.bodyLarge
                     )
@@ -187,7 +187,7 @@ fun HomeScreen(
 
                 Text(
                     modifier = modifier.padding(top = 8.dp),
-                    text = currentWeatherState.value.currentWeatherResponse.current.condition.text,
+                    text = currentWeatherState.value.currentWeatherResponse.currentDto.conditionDto.text,
                     fontSize = 16.sp,
                     style = MaterialTheme.typography.bodyLarge
                 )
@@ -231,7 +231,7 @@ fun HomeScreen(
                         val listState = rememberLazyListState()
                         LazyColumn(state = listState) {
                             itemsIndexed(
-                                items = taskState.value.taskList,
+                                items = taskState.value.taskEntityList,
                                 key = { _, task ->
                                     task.id
                                 }
@@ -290,7 +290,7 @@ fun HomeScreen(
                         val listState = rememberLazyListState()
                         LazyColumn(state = listState) {
                             itemsIndexed(
-                                items = taskState.value.taskList,
+                                items = taskState.value.taskEntityList,
                                 key = { _, task ->
                                     task.id
                                 }
@@ -362,7 +362,7 @@ fun HomeScreenPreview() {
         taskState = remember {
             mutableStateOf(
                 TaskState(
-                    taskList = listOf(Task(title = "Title", description = "Description"))
+                    taskEntityList = listOf(TaskEntity(title = "Title", description = "Description"))
                 )
             )
         },
@@ -371,22 +371,22 @@ fun HomeScreenPreview() {
             mutableStateOf(
                 CurrentWeatherState(
                     currentWeatherResponse = CurrentWeatherResponse(
-                        location = Location(name = "Johannesburg"),
-                        current = Current(
+                        location = LocationDto(name = "Johannesburg"),
+                        currentDto = CurrentDto(
                             temperatureCelsius = 20.0,
-                            condition = Condition(
+                            conditionDto = ConditionDto(
                                 text = "Sunny",
                                 icon = "//cdn.weatherapi.com/weather/64x64/day/113.png"
                             )
                         ),
-                        forecast = Forecast(
-                            forecastDayList = listOf(
-                                ForecastDay(
-                                    day = Day(
+                        forecastDto = ForecastDto(
+                            forecastDayDtoList = listOf(
+                                ForecastDayDto(
+                                    dayDto = DayDto(
                                         maxTemperatureCelsius = 25.0,
                                         minTemperatureCelsius = 12.0
                                     ),
-                                    astro = Astro(
+                                    astroDto = AstroDto(
                                         sunrise = "06:00",
                                         sunset = "17:00"
                                     )

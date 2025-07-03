@@ -1,13 +1,13 @@
 package za.co.todoapp.data.model.dto.currentWeather
 
 import kotlinx.serialization.Serializable
-import za.co.todoapp.data.model.dto.currentWeather.dto.Current
-import za.co.todoapp.data.model.dto.currentWeather.dto.Forecast
-import za.co.todoapp.data.model.dto.currentWeather.dto.Location
+import za.co.todoapp.data.model.dto.currentWeather.dto.CurrentDto
+import za.co.todoapp.data.model.dto.currentWeather.dto.ForecastDto
+import za.co.todoapp.data.model.dto.currentWeather.dto.LocationDto
 
 @Serializable
 class CurrentWeatherResponse(
-    val location: Location = Location(),
-    val current: Current = Current(),
-    val forecast: Forecast = Forecast()
+    val location: LocationDto = LocationDto(),
+    val currentDto: CurrentDto = CurrentDto(),
+    val forecastDto: ForecastDto = ForecastDto()
 )
