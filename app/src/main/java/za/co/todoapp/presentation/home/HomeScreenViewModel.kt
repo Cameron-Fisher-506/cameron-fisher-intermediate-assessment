@@ -20,8 +20,8 @@ import za.co.todoapp.common.services.navigation.Destination
 import za.co.todoapp.common.services.navigation.Navigator
 import za.co.todoapp.common.services.preferences.sharedPreferences.SharedPreferencesManager
 import za.co.todoapp.common.services.resource.ResourceManager
-import za.co.todoapp.data.model.Task
-import za.co.todoapp.data.model.currentWeather.CurrentWeatherResponse
+import za.co.todoapp.data.model.entity.Task
+import za.co.todoapp.data.model.dto.currentWeather.CurrentWeatherResponse
 import za.co.todoapp.domain.DeleteTaskUseCase
 import za.co.todoapp.domain.FetchTodayWeatherForecastUseCase
 import za.co.todoapp.domain.GetAllTaskByCompleteStatusUseCase

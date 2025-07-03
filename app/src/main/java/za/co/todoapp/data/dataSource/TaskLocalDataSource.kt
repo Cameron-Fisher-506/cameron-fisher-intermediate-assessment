@@ -5,7 +5,7 @@ import za.co.todoapp.common.utilities.Resource
 import za.co.todoapp.data.local.ApplicationDatabase
 import za.co.todoapp.data.local.ITaskDao
 import za.co.todoapp.data.local.upsert
-import za.co.todoapp.data.model.Task
+import za.co.todoapp.data.model.entity.Task
 
 class TaskLocalDataSource(application: Application) {
     private val taskDao: ITaskDao = ApplicationDatabase.getDatabase(application).taskDao()
@@ -15,7 +15,7 @@ class TaskLocalDataSource(application: Application) {
     }
 
     suspend fun upsert(task: Task): Resource<Task> {
-        return ApplicationDatabase.getResource { taskDao.upsert(task, taskDao) }
+        return ApplicationDatabase.getResource { taskDao upsert task }
     }
 
     suspend fun delete(task: Task): Resource<Int> {

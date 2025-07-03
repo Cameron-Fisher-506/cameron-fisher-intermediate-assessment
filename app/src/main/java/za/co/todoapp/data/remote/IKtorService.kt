@@ -8,7 +8,7 @@ import io.ktor.client.plugins.logging.Logging
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 import za.co.todoapp.common.utilities.Resource
-import za.co.todoapp.data.model.currentWeather.CurrentWeatherResponse
+import za.co.todoapp.data.model.dto.currentWeather.CurrentWeatherResponse
 
 interface IKtorService {
     suspend fun fetchTodayWeatherForecast(latitude: Double, longitude: Double): Resource<CurrentWeatherResponse>
