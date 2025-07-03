@@ -13,7 +13,7 @@ import za.co.todoapp.common.services.location.LocationManager
 import za.co.todoapp.common.services.navigation.Navigator
 import za.co.todoapp.common.services.preferences.sharedPreferences.SharedPreferencesManager
 import za.co.todoapp.common.services.resource.ResourceManager
-import za.co.todoapp.data.model.Task
+import za.co.todoapp.data.model.entity.TaskEntity
 import za.co.todoapp.domain.DeleteTaskUseCase
 import za.co.todoapp.domain.FetchTodayWeatherForecastUseCase
 import za.co.todoapp.domain.GetAllTaskByCompleteStatusUseCase
@@ -85,21 +85,21 @@ class HomeScreenViewModelTest {
     @Test
     @DisplayName("Delete Task")
     fun shouldCallDeleteTaskUseCaseWhenDeleteTaskIsCalled() {
-        every { deleteTaskUseCase(any<Task>()) } returns flow {}
+        every { deleteTaskUseCase(any<TaskEntity>()) } returns flow {}
 
-        homeScreenViewModel.deleteTask(Task())
+        homeScreenViewModel.deleteTask(TaskEntity())
 
-        verify(exactly = 1) { deleteTaskUseCase.invoke(any<Task>()) }
+        verify(exactly = 1) { deleteTaskUseCase.invoke(any<TaskEntity>()) }
     }
 
     @Test
     @DisplayName("Update Task Complete Status")
     fun shouldCallSaveOrUpdateUseCaseWhenUpdateTaskCompleteStatusIsCalled() {
-        every { saveOrUpdateTaskUseCase(any<Task>()) } returns flow {}
+        every { saveOrUpdateTaskUseCase(any<TaskEntity>()) } returns flow {}
 
-        homeScreenViewModel.updateTaskCompleteStatus(Task())
+        homeScreenViewModel.updateTaskCompleteStatus(TaskEntity())
 
-        verify(exactly = 1) { saveOrUpdateTaskUseCase.invoke(any<Task>()) }
+        verify(exactly = 1) { saveOrUpdateTaskUseCase.invoke(any<TaskEntity>()) }
     }
 
     @Test

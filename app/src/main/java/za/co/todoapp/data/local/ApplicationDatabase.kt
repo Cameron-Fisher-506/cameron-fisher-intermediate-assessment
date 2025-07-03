@@ -5,9 +5,9 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import za.co.todoapp.common.utilities.Resource
-import za.co.todoapp.data.model.Task
+import za.co.todoapp.data.model.entity.TaskEntity
 
-@Database(entities = [Task::class], version = 1, exportSchema = false)
+@Database(entities = [TaskEntity::class], version = 1, exportSchema = false)
 abstract class ApplicationDatabase: RoomDatabase() {
     abstract fun taskDao(): ITaskDao
 

@@ -1,9 +1,9 @@
-package za.co.todoapp.data.model.currentWeather.dto
+package za.co.todoapp.data.model.dto.currentWeather.dto
 
 import kotlinx.serialization.Serializable
 
 @Serializable
-class Condition(
+class ConditionDto(
     val text: String = "",
     val icon: String = ""
 )
