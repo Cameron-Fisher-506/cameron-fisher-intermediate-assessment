@@ -22,11 +22,13 @@ import za.co.todoapp.common.services.preferences.sharedPreferences.SharedPrefere
 import za.co.todoapp.common.services.resource.ResourceManager
 import za.co.todoapp.data.model.entity.TaskEntity
 import za.co.todoapp.data.model.dto.currentWeather.CurrentWeatherResponse
-import za.co.todoapp.domain.DeleteTaskUseCase
-import za.co.todoapp.domain.FetchTodayWeatherForecastUseCase
-import za.co.todoapp.domain.GetAllTaskByCompleteStatusUseCase
-import za.co.todoapp.domain.SaveOrUpdateTaskUseCase
+import za.co.todoapp.domain.usecase.DeleteTaskUseCase
+import za.co.todoapp.domain.usecase.FetchTodayWeatherForecastUseCase
+import za.co.todoapp.domain.usecase.GetAllTaskByCompleteStatusUseCase
+import za.co.todoapp.domain.usecase.SaveOrUpdateTaskUseCase
 import za.co.todoapp.presentation.BaseViewModel
+import za.co.todoapp.presentation.mapper.TodayWeatherForecastDomainUiMapper
+import za.co.todoapp.presentation.model.TodayWeatherForecastUiModel
 
 class HomeScreenViewModel(
     private val navigator: Navigator,
@@ -64,7 +66,7 @@ class HomeScreenViewModel(
 
     data class CurrentWeatherState(
         val isLoading: Boolean = false,
-        val currentWeatherResponse: CurrentWeatherResponse = CurrentWeatherResponse(),
+        val todayWeatherForecastUiModel: TodayWeatherForecastUiModel = TodayWeatherForecastUiModel(),
         val errorMessage: String = ""
     )
 
@@ -186,13 +188,14 @@ class HomeScreenViewModel(
     }
 
     fun fetchTodayWeatherForecast(latitude: Double, longitude: Double) {
+        val todayWeatherForecastDomainUiMapper = TodayWeatherForecastDomainUiMapper()
         fetchTodayWeatherForecastUseCase(latitude, longitude).onEach { resource ->
             when (resource.status) {
                 Status.SUCCESS -> {
                     val data = resource.data
                     if (data != null) {
                         currentWeatherMutableState.value =
-                            CurrentWeatherState(currentWeatherResponse = data)
+                            CurrentWeatherState(todayWeatherForecastUiModel = todayWeatherForecastDomainUiMapper.map(data))
                     }
                 }
 

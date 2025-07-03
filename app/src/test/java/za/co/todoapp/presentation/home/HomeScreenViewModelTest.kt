@@ -14,10 +14,10 @@ import za.co.todoapp.common.services.navigation.Navigator
 import za.co.todoapp.common.services.preferences.sharedPreferences.SharedPreferencesManager
 import za.co.todoapp.common.services.resource.ResourceManager
 import za.co.todoapp.data.model.entity.TaskEntity
-import za.co.todoapp.domain.DeleteTaskUseCase
-import za.co.todoapp.domain.FetchTodayWeatherForecastUseCase
-import za.co.todoapp.domain.GetAllTaskByCompleteStatusUseCase
-import za.co.todoapp.domain.SaveOrUpdateTaskUseCase
+import za.co.todoapp.domain.usecase.DeleteTaskUseCase
+import za.co.todoapp.domain.usecase.FetchTodayWeatherForecastUseCase
+import za.co.todoapp.domain.usecase.GetAllTaskByCompleteStatusUseCase
+import za.co.todoapp.domain.usecase.SaveOrUpdateTaskUseCase
 
 class HomeScreenViewModelTest {
     private val navigator = mockk<Navigator>()

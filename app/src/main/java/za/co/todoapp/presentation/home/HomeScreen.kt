@@ -70,6 +70,7 @@ import za.co.todoapp.presentation.home.HomeScreenViewModel.CurrentWeatherState
 import za.co.todoapp.presentation.home.HomeScreenViewModel.TabItem
 import za.co.todoapp.presentation.home.HomeScreenViewModel.TaskState
 import za.co.todoapp.presentation.home.HomeScreenViewModel.DeleteTaskState
+import za.co.todoapp.presentation.model.TodayWeatherForecastUiModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -148,7 +149,7 @@ fun HomeScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = currentWeatherState.value.currentWeatherResponse.location.name,
+                        text = currentWeatherState.value.todayWeatherForecastUiModel.locationName,
                         fontSize = 16.sp,
                         style = MaterialTheme.typography.bodyLarge
                     )
@@ -161,33 +162,29 @@ fun HomeScreen(
 
                 Text(
                     modifier = modifier.padding(top = 8.dp),
-                    text = "${currentWeatherState.value.currentWeatherResponse.currentDto.temperatureCelsius}℃",
+                    text = "${currentWeatherState.value.todayWeatherForecastUiModel.temperatureCelsius}℃",
                     fontWeight = FontWeight.Bold,
                     fontSize = 64.sp,
                     style = MaterialTheme.typography.titleLarge
                 )
 
-                if (currentWeatherState.value.currentWeatherResponse.forecastDto.forecastDayDtoList.isNotEmpty()) {
-                    val forecastDay =
-                        currentWeatherState.value.currentWeatherResponse.forecastDto.forecastDayDtoList.first()
-                    Text(
-                        modifier = modifier.padding(top = 8.dp),
-                        text = "${forecastDay.dayDto.maxTemperatureCelsius}℃ / ${forecastDay.dayDto.minTemperatureCelsius}℃",
-                        fontSize = 16.sp,
-                        style = MaterialTheme.typography.bodyLarge
-                    )
-
-                    Text(
-                        modifier = modifier.padding(top = 8.dp),
-                        text = "Sunrise ${forecastDay.astroDto.sunrise} / Sunset ${forecastDay.astroDto.sunset}",
-                        fontSize = 16.sp,
-                        style = MaterialTheme.typography.bodyLarge
-                    )
-                }
+                Text(
+                    modifier = modifier.padding(top = 8.dp),
+                    text = "${currentWeatherState.value.todayWeatherForecastUiModel.maxTemperatureCelsius}℃ / ${currentWeatherState.value.todayWeatherForecastUiModel.minTemperatureCelsius}℃",
+                    fontSize = 16.sp,
+                    style = MaterialTheme.typography.bodyLarge
+                )
 
                 Text(
                     modifier = modifier.padding(top = 8.dp),
-                    text = currentWeatherState.value.currentWeatherResponse.currentDto.conditionDto.text,
+                    text = "Sunrise ${currentWeatherState.value.todayWeatherForecastUiModel.sunrise} / Sunset ${currentWeatherState.value.todayWeatherForecastUiModel.sunset}",
+                    fontSize = 16.sp,
+                    style = MaterialTheme.typography.bodyLarge
+                )
+
+                Text(
+                    modifier = modifier.padding(top = 8.dp),
+                    text = currentWeatherState.value.todayWeatherForecastUiModel.condition,
                     fontSize = 16.sp,
                     style = MaterialTheme.typography.bodyLarge
                 )
@@ -370,29 +367,14 @@ fun HomeScreenPreview() {
         currentWeatherState = remember {
             mutableStateOf(
                 CurrentWeatherState(
-                    currentWeatherResponse = CurrentWeatherResponse(
-                        location = LocationDto(name = "Johannesburg"),
-                        currentDto = CurrentDto(
-                            temperatureCelsius = 20.0,
-                            conditionDto = ConditionDto(
-                                text = "Sunny",
-                                icon = "//cdn.weatherapi.com/weather/64x64/day/113.png"
-                            )
-                        ),
-                        forecastDto = ForecastDto(
-                            forecastDayDtoList = listOf(
-                                ForecastDayDto(
-                                    dayDto = DayDto(
-                                        maxTemperatureCelsius = 25.0,
-                                        minTemperatureCelsius = 12.0
-                                    ),
-                                    astroDto = AstroDto(
-                                        sunrise = "06:00",
-                                        sunset = "17:00"
-                                    )
-                                )
-                            )
-                        )
+                    todayWeatherForecastUiModel = TodayWeatherForecastUiModel(
+                        locationName = "Johannesburg",
+                        maxTemperatureCelsius = 0.0,
+                        minTemperatureCelsius = 0.0,
+                        condition = "Sunny",
+                        sunset = "17:00",
+                        sunrise = "06:00",
+                        temperatureCelsius = 0.0
                     )
                 )
             )

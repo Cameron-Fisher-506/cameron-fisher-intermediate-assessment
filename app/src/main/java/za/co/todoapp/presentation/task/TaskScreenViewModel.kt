@@ -12,7 +12,7 @@ import za.co.todoapp.common.enum.Status
 import za.co.todoapp.common.services.navigation.Navigator
 import za.co.todoapp.common.services.resource.ResourceManager
 import za.co.todoapp.data.model.entity.TaskEntity
-import za.co.todoapp.domain.SaveOrUpdateTaskUseCase
+import za.co.todoapp.domain.usecase.SaveOrUpdateTaskUseCase
 import za.co.todoapp.presentation.BaseViewModel
 
 class TaskScreenViewModel(

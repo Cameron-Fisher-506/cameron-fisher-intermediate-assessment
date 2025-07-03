@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test
 import za.co.todoapp.common.services.navigation.Navigator
 import za.co.todoapp.common.services.resource.ResourceManager
 import za.co.todoapp.data.model.entity.TaskEntity
-import za.co.todoapp.domain.SaveOrUpdateTaskUseCase
+import za.co.todoapp.domain.usecase.SaveOrUpdateTaskUseCase
 
 class TaskEntityScreenViewModelTest {
     private val navigator = mockk<Navigator>()

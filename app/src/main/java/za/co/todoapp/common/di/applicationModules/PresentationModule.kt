@@ -29,4 +29,6 @@ val presentationModule = module {
     single<LocationManager> {
         LocationManager(get())
     }
+
+
 }
